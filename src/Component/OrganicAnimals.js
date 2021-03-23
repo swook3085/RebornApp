@@ -2,16 +2,19 @@ import axios from 'axios'
 import React, { Component } from 'react'
 import { Text, View, StyleSheet, Animated, Button, TouchableOpacity } from 'react-native'
 import { SERVICE_KEY, SERVICE_URL } from '../Util/CommDef';
-import { isEmptyValid, prevMonthYear, dateToString } from '../Util/Util';
+import { isEmptyValid, prevMonthYear, dateToString, dateFomat } from '../Util/Util';
 import { Picker } from '@react-native-community/picker';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import DatePicker from 'react-native-datepicker'
+import Date from './Modal/DatePicker';
 
 export default class OrganicAnimals extends Component {
     constructor(props) {
         super(props);
-        var date = prevMonthYear(3);
+        var startDate = prevMonthYear(3);
+        var endDate = prevMonthYear(0);
         this.state = {
+            modal: false,                                                         // 모달창 열고 닫기
+            openName: '',                                                       // 모달 이름
             animation: new Animated.Value(40),
             select: false,
             sidoDataBody: [],                                                   // 시도 전체 정보
@@ -24,8 +27,10 @@ export default class OrganicAnimals extends Component {
             kindDataBody: [],                                                   // 품종 전체 정보
             kindData: [{ label: `전 체`, value: 0 }],                  // 품종 정보
             kind: '',                                                                    // 품종 값
-            startDate: date,                                                      // 시작 날짜
-            endDate: new Date(),                                             // 종료 날짜
+            startDateInit: startDate,                                          // 시작 날짜
+            startDate: startDate,                                               // 시작 날짜
+            endDateInit: endDate,                                            // 종료 날짜
+            endDate: endDate,                                                 // 종료 날짜
         }
     }
 
@@ -139,6 +144,13 @@ export default class OrganicAnimals extends Component {
         //     console.log(res.data.response.body);
         // });
     }
+
+    modalEvent = openName => () => {
+        this.setState({
+            modal: !this.state.modal,
+            openName
+        })
+    }
     onChage = async (value) => {
         await this.setState({
             sido: value
@@ -163,7 +175,7 @@ export default class OrganicAnimals extends Component {
         if (!this.state.select) {
             Animated.timing(this.state.animation, {
                 toValue: 120,
-                duration: 1000,
+                duration: 800,
                 useNativeDriver: false
             }).start();
             this.setState({
@@ -172,7 +184,7 @@ export default class OrganicAnimals extends Component {
         } else {
             Animated.timing(this.state.animation, {
                 toValue: 40,
-                duration: 1000,
+                duration: 800,
                 useNativeDriver: false
             }).start();
             this.setState({
@@ -180,9 +192,44 @@ export default class OrganicAnimals extends Component {
             })
         }
     }
+    inputOnChange = state => event => {
+        this.setState({
+            [state]: event.currentTarget.value
+        })
+    }
+    onDateChange = state => (selectedDate) => {
+        this.setState({
+            [state]: selectedDate
+        })
+    };
+    onDateEvent = state => () => {
+        if (state === 'startDate') {
+            this.setState({
+                [state]: this.state.startDateInit,
+                modal: false
+            });
+        }
+        if (state === 'endDate') {
+            this.setState({
+                [state]: this.state.endDateInit,
+                modal: false
+            });
+        }
+    };
 
 
-
+    modalRender = () => {
+        if (this.state.openName === 'startDate') {
+            return (
+                <Date date={this.state.startDate} modal={this.modalEvent('startDate')} onDateChange={this.onDateChange('startDateInit')} onDateEvent={this.onDateEvent('startDate')} />
+            )
+        }
+        if (this.state.openName === 'endDate') {
+            return (
+                <Date date={this.state.endDate} modal={this.modalEvent('endDate')} onDateChange={this.onDateChange('endDateInit')} onDateEvent={this.onDateEvent('endDate')} />
+            )
+        }
+    }
 
     render() {
         return (
@@ -192,6 +239,7 @@ export default class OrganicAnimals extends Component {
                         <View style={{ flex: 1, flexDirection: 'row', borderBottomWidth: 1 }}>
                             <View style={{ flex: 1, backgroundColor: '#fff' }}>
                                 <Picker
+                                    enabled={true}
                                     selectedValue={this.state.upkind}
                                     style={styles.selectStyle}
                                     onValueChange={(value) => this.inputOnChange('upkind', value)}
@@ -204,6 +252,7 @@ export default class OrganicAnimals extends Component {
                             </View>
                             <View style={{ flex: 1, backgroundColor: '#fff' }}>
                                 <Picker
+                                    enabled={true}
                                     selectedValue={this.state.kind}
                                     style={styles.selectStyle}
                                     onValueChange={(value) => this.inputOnChange('kind', value)}
@@ -219,6 +268,7 @@ export default class OrganicAnimals extends Component {
                         <View style={{ flex: 1, backgroundColor: 'blue', flexDirection: 'row', borderBottomWidth: 1 }}>
                             <View style={{ flex: 1, backgroundColor: '#fff' }}>
                                 <Picker
+                                    enabled={true}
                                     selectedValue={this.state.sido}
                                     style={styles.selectStyle}
                                     onValueChange={(value) => this.inputOnChange('sido', value)}
@@ -232,6 +282,7 @@ export default class OrganicAnimals extends Component {
                             </View>
                             <View style={{ flex: 1, backgroundColor: '#fff' }}>
                                 <Picker
+                                    enabled={true}
                                     selectedValue={this.state.sigungu}
                                     style={styles.selectStyle}
                                     onValueChange={(value) => this.inputOnChange('sigungu', value)}
@@ -246,49 +297,15 @@ export default class OrganicAnimals extends Component {
                         </View>
                         <View style={{ flex: 1, flexDirection: 'row', backgroundColor: '#fff', alignItems: 'center' }}>
                             <View style={{ flex: 1, alignItems: 'center' }}>
-                                <DatePicker
-                                    style={{ flex: 1 }}
-                                    date={this.state.startDate}
-                                    mode="date"
-                                    placeholder="select date"
-                                    format="YYYY-MM-DD"
-                                    androidMode="spinner"
-                                    confirmBtnText="선택"
-                                    cancelBtnText="취소"
-                                    customStyles={{
-                                        dateIcon: {
-                                            display: 'none'
-                                        },
-                                        dateInput: {
-                                            marginLeft: 0,
-                                            borderWidth: 0
-                                        }
-                                    }}
-                                    onDateChange={(date) => { this.setState({ startDate: date }) }}
-                                />
+                                <TouchableOpacity style={{ width: '100%', flex: 1, justifyContent: 'center', alignItems: 'center' }} activeOpacity={1} onPress={this.modalEvent('startDate')}>
+                                    <Text style={{ fontSize: 16 }}>{dateFomat(dateToString(this.state.startDate))}</Text>
+                                </TouchableOpacity>
                             </View>
                             <Text>~</Text>
                             <View style={{ flex: 1, alignItems: 'center' }}>
-                                <DatePicker
-                                    style={{ flex: 1 }}
-                                    date={this.state.endDate}
-                                    mode="date"
-                                    placeholder="select date"
-                                    format="YYYY-MM-DD"
-                                    androidMode="spinner"
-                                    confirmBtnText="선택"
-                                    cancelBtnText="취소"
-                                    customStyles={{
-                                        dateIcon: {
-                                            display: 'none'
-                                        },
-                                        dateInput: {
-                                            marginLeft: 0,
-                                            borderWidth: 0
-                                        }
-                                    }}
-                                    onDateChange={(date) => { this.setState({ endDate: date }) }}
-                                />
+                                <TouchableOpacity style={{ width: '100%', flex: 1, justifyContent: 'center', alignItems: 'center' }} activeOpacity={1} onPress={this.modalEvent('endDate')}>
+                                    <Text style={{ fontSize: 16 }}>{dateFomat(dateToString(this.state.endDate))}</Text>
+                                </TouchableOpacity>
                             </View>
                         </View>
                     </View>
@@ -301,35 +318,10 @@ export default class OrganicAnimals extends Component {
                 <TouchableOpacity activeOpacity={0.8} style={styles.button} onPress={this.onPress}>
                     <Text>{this.state.select ? '접기' : '열기'}</Text>
                 </TouchableOpacity>
-                {/* <View style={styles.card}>
-                    <View style={styles.card}>
-                        {this.state.sidoData.length > 0 &&    
-                            <Picker
-                                selectedValue={this.state.upkind}
-                                style={styles.selectStyle} 
-                                onValueChange={(value) => this.inputOnChange('upkind', value)}
-                            >
-                                <Picker.Item label={`전 체`} value={0} />
-                                <Picker.Item label={`강아지`} value={`417000`} />
-                                <Picker.Item label={`고양이`} value={`422400`} />
-                                <Picker.Item label={`기 타`} value={`429900`} />
-                            </Picker> 
-                        }
-                    </View>
-                    {this.state.sidoData.length > 0 &&    
-                        <Picker
-                            selectedValue={this.state.sido}
-                            style={styles.selectStyle} 
-                            onValueChange={(value) => this.inputOnChange('sido', value)}
-                        >
-                            {this.state.sidoData.map((data, index) => {
-                                return (
-                                    <Picker.Item key={index} label={`${data.label}`} value={`${data.value}`} />
-                                )
-                            })}
-                        </Picker> 
-                    }
-                </View> */}
+                <View style={{ flex: 1, backgroundColor: 'gray' }}>
+
+                </View>
+                {this.state.modal && this.modalRender()}
             </View>
         )
     }
