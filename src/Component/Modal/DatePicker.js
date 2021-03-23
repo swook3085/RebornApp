@@ -29,23 +29,18 @@ export default class DatePickerModal extends Component {
 
 const styles = StyleSheet.create({
     container: {
-        position: 'absolute',
-        height: '100%',
-        width: '100%',
-        backgroundColor: 'transparent',
+        flex:1,
+        justifyContent :'center'
     },
     background: {
         position: 'absolute',
         height: '100%',
         width: '100%',
-        backgroundColor: 'rgba(0,0,0,0.5)',
         overflow: 'hidden'
     },
     modal: {
-        marginHorizontal: 20,
         borderRadius: 10,
         alignItems: 'center',
-        marginTop: '50%',
         backgroundColor: 'white',
         overflow: 'hidden',
     },

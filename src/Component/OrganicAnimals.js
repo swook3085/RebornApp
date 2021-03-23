@@ -6,6 +6,7 @@ import { isEmptyValid, prevMonthYear, dateToString, dateFomat } from '../Util/Ut
 import { Picker } from '@react-native-community/picker';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import Date from './Modal/DatePicker';
+import Modal from 'react-native-modal';
 
 export default class OrganicAnimals extends Component {
     constructor(props) {
@@ -140,9 +141,9 @@ export default class OrganicAnimals extends Component {
             endDate: dateToString(this.state.endDate)          // 종료 날짜
         };
         console.log(param);
-        // await axios.get(`${SERVICE_URL}abandonmentPublic?upkind=${upkind}&kind=${kind}&upr_cd=${sidoorgCd}&org_cd=${sigunguorgCd}&bgnde=${dateToString(this.state.startDate)}&endde=${dateToString(this.state.endDate)}&pageNo=1&numOfRows=20&serviceKey=${SERVICE_KEY}`).then((res) => {
-        //     console.log(res.data.response.body);
-        // });
+        await axios.get(`${SERVICE_URL}abandonmentPublic?upkind=${upkind}&kind=${kind}&upr_cd=${sidoorgCd}&org_cd=${sigunguorgCd}&bgnde=${dateToString(this.state.startDate)}&endde=${dateToString(this.state.endDate)}&pageNo=1&numOfRows=20&serviceKey=${SERVICE_KEY}`).then((res) => {
+            console.log(res.data.response.body);
+        });
     }
 
     modalEvent = openName => () => {
@@ -192,11 +193,6 @@ export default class OrganicAnimals extends Component {
             })
         }
     }
-    inputOnChange = state => event => {
-        this.setState({
-            [state]: event.currentTarget.value
-        })
-    }
     onDateChange = state => (selectedDate) => {
         this.setState({
             [state]: selectedDate
@@ -239,7 +235,6 @@ export default class OrganicAnimals extends Component {
                         <View style={{ flex: 1, flexDirection: 'row', borderBottomWidth: 1 }}>
                             <View style={{ flex: 1, backgroundColor: '#fff' }}>
                                 <Picker
-                                    enabled={true}
                                     selectedValue={this.state.upkind}
                                     style={styles.selectStyle}
                                     onValueChange={(value) => this.inputOnChange('upkind', value)}
@@ -252,7 +247,6 @@ export default class OrganicAnimals extends Component {
                             </View>
                             <View style={{ flex: 1, backgroundColor: '#fff' }}>
                                 <Picker
-                                    enabled={true}
                                     selectedValue={this.state.kind}
                                     style={styles.selectStyle}
                                     onValueChange={(value) => this.inputOnChange('kind', value)}
@@ -265,10 +259,9 @@ export default class OrganicAnimals extends Component {
                                 </Picker>
                             </View>
                         </View>
-                        <View style={{ flex: 1, backgroundColor: 'blue', flexDirection: 'row', borderBottomWidth: 1 }}>
+                        <View style={{ flex: 1, flexDirection: 'row', borderBottomWidth: 1 }}>
                             <View style={{ flex: 1, backgroundColor: '#fff' }}>
                                 <Picker
-                                    enabled={true}
                                     selectedValue={this.state.sido}
                                     style={styles.selectStyle}
                                     onValueChange={(value) => this.inputOnChange('sido', value)}
@@ -282,7 +275,6 @@ export default class OrganicAnimals extends Component {
                             </View>
                             <View style={{ flex: 1, backgroundColor: '#fff' }}>
                                 <Picker
-                                    enabled={true}
                                     selectedValue={this.state.sigungu}
                                     style={styles.selectStyle}
                                     onValueChange={(value) => this.inputOnChange('sigungu', value)}
@@ -321,7 +313,9 @@ export default class OrganicAnimals extends Component {
                 <View style={{ flex: 1, backgroundColor: 'gray' }}>
 
                 </View>
-                {this.state.modal && this.modalRender()}
+                <Modal isVisible={this.state.modal}>
+                    {this.state.modal && this.modalRender()}
+                </Modal>
             </View>
         )
     }
