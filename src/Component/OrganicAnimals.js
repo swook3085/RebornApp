@@ -221,12 +221,12 @@ export default class OrganicAnimals extends Component {
     modalRender = () => {
         if (this.state.openName === 'startDate') {
             return (
-                <Date date={this.state.startDate} modal={this.modalEvent('startDate')} onDateChange={this.onDateChange('startDateInit')} onDateEvent={this.onDateEvent('startDate')} />
+                <Date date={this.state.startDate} title={'시작일 설정'} modal={this.modalEvent('startDate')} onDateChange={this.onDateChange('startDateInit')} onDateEvent={this.onDateEvent('startDate')} />
             )
         }
         if (this.state.openName === 'endDate') {
             return (
-                <Date date={this.state.endDate} modal={this.modalEvent('endDate')} onDateChange={this.onDateChange('endDateInit')} onDateEvent={this.onDateEvent('endDate')} />
+                <Date date={this.state.endDate} title={'종료일 설정'} modal={this.modalEvent('endDate')} onDateChange={this.onDateChange('endDateInit')} onDateEvent={this.onDateEvent('endDate')} />
             )
         }
     }

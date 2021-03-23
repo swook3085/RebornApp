@@ -9,7 +9,7 @@ export default class DatePickerModal extends Component {
                 <TouchableOpacity style={styles.background} activeOpacity={1} onPress={this.props.modal} />
                 <View style={styles.modal}>
                     <View style={styles.title}>
-                        <Text style={styles.titleText}>설정</Text>
+                        <Text style={styles.titleText}>{this.props.title}</Text>
                     </View>
                     <DatePicker
                         style={{ marginTop: 10, marginBottom: 20 }}
