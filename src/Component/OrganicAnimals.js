@@ -1,6 +1,6 @@
 import axios from 'axios'
 import React, { Component } from 'react'
-import { Text, View, StyleSheet, Animated, Button, TouchableOpacity } from 'react-native'
+import { Text, View, StyleSheet, Animated, Button, TouchableOpacity, ScrollView, FlatList } from 'react-native'
 import { SERVICE_KEY, SERVICE_URL } from '../Util/CommDef';
 import { isEmptyValid, prevMonthYear, dateToString, dateFomat } from '../Util/Util';
 import { Picker } from '@react-native-community/picker';
@@ -310,9 +310,9 @@ export default class OrganicAnimals extends Component {
                 <TouchableOpacity activeOpacity={0.8} style={styles.button} onPress={this.onPress}>
                     <Text>{this.state.select ? '접기' : '열기'}</Text>
                 </TouchableOpacity>
-                <View style={{ flex: 1, backgroundColor: 'gray' }}>
-
-                </View>
+                <FlatList style={{ flex: 1, backgroundColor: 'gray' }}>
+                    
+                </FlatList>
                 <Modal isVisible={this.state.modal}>
                     {this.state.modal && this.modalRender()}
                 </Modal>
