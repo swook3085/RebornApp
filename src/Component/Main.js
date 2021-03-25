@@ -8,7 +8,7 @@ import Story from './Story';
 import { NavigationContainer } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {TabBar} from './TabBar';
+import { TabBar } from './TabBar';
 
 const Tab = createBottomTabNavigator();
 
@@ -16,14 +16,16 @@ export default class Main extends Component {
     render() {
         return (
             <>
-                <Header/>
-                <NavigationContainer>
-                    <Tab.Navigator tabBar={props => <TabBar {...props} />}>
-                        <Tab.Screen name="home" component={Home}/>
-                        <Tab.Screen name="search" component={OrganicAnimals}/>
-                        <Tab.Screen name="story" component={Story}/>
-                    </Tab.Navigator>
-                </NavigationContainer>
+                <View style={{ flex: 1, backgroundColor: '#f4f6fc' }}>
+                    <Header />
+                    <NavigationContainer>
+                        <Tab.Navigator tabBar={props => <TabBar {...props} />} >
+                            <Tab.Screen name="home" component={Home} />
+                            <Tab.Screen name="search" component={OrganicAnimals} />
+                            <Tab.Screen name="story" component={Story} />
+                        </Tab.Navigator>
+                    </NavigationContainer>
+                </View>
             </>
         )
     }

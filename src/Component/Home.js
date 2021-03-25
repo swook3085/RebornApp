@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 
 export default class Home extends Component {
     static navigationOption = {
-        tabBarIcon : () => {return <Icon name="home"></Icon>}
+        tabBarIcon: () => { return <Icon name="home"></Icon> }
     }
     render() {
         return (
@@ -16,10 +16,11 @@ export default class Home extends Component {
 }
 
 const styles = StyleSheet.create({
-    container : {
-        flex : 1,
-        justifyContent : 'center',
-        alignItems : 'center'
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#f4f6fc'
     }
 })
 
