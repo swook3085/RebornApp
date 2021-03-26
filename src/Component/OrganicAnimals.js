@@ -1,6 +1,6 @@
 import axios from 'axios'
 import React, { Component } from 'react'
-import { Text, View, StyleSheet, Animated, Button, TouchableOpacity, ScrollView, FlatList } from 'react-native'
+import { Text, View, StyleSheet, Animated, Button, TouchableOpacity, ScrollView, FlatList, Dimensions, SafeAreaView, Image } from 'react-native'
 import { SERVICE_KEY, SERVICE_URL } from '../Util/CommDef';
 import { isEmptyValid, prevMonthYear, dateToString, dateFomat } from '../Util/Util';
 import { Picker } from '@react-native-community/picker';
@@ -9,6 +9,10 @@ import Date from './Modal/DatePicker';
 import Modal from 'react-native-modal';
 import ListItem from './Animals/ListItem';
 import DetailAnimals from './Modal/DetailAnimals';
+import { SharedElement } from 'react-native-shared-element';
+
+const WINDOW_WIDTH = Dimensions.get('window').width;
+const WINDOW_HEIGHT = Dimensions.get('window').height;
 
 export default class OrganicAnimals extends Component {
     constructor(props) {
@@ -16,7 +20,8 @@ export default class OrganicAnimals extends Component {
         var startDate = prevMonthYear(3);
         var endDate = prevMonthYear(0);
         this.state = {
-            opacity: new Animated.Value(1),
+            indexChk: null,                                                        // 리스트 클릭
+            value: new Animated.Value(0),
             detaileModal: false,                                             // 상세정보 모달창 열고닫기
             modal: false,                                                         // 모달창 열고 닫기
             openName: '',                                                       // 모달 이름
@@ -44,6 +49,22 @@ export default class OrganicAnimals extends Component {
     async componentDidMount() {
         await this.getSidoInfoApi();
         await this.searchOnPress();
+        this.opacity = this.state.value.interpolate({
+            inputRange: [0, 1],
+            outputRange: [1, 0],
+        });
+        this.x = this.state.value.interpolate({
+            inputRange: [0, 0.5, 1],
+            outputRange: [0, 20, 200],
+        });
+        this.height = this.state.value.interpolate({
+            inputRange: [0, 1],
+            outputRange: [150, 250],
+        });
+        this.top = this.state.value.interpolate({
+            inputRange: [0, 1],
+            outputRange: [0, 0],
+        });
     }
     // 품종 정보 가져오기
     getKindInfoApi = async (upkind) => {
@@ -156,9 +177,17 @@ export default class OrganicAnimals extends Component {
     // 모달 이벤트
     modalEvent = openName => () => {
         if (openName === 'detail') {
+            Animated.timing(this.state.value, {
+                toValue: 0,
+                duration: 1000,
+                useNativeDriver: false
+            }).start();
+            this.opacity = this.state.value.interpolate({
+                inputRange: [0, 1],
+                outputRange: [1, 0],
+            });
             this.setState({
                 detaileModal: !this.state.detaileModal,
-                opacity: new Animated.Value(1),
                 openName
             })
             return;
@@ -188,7 +217,7 @@ export default class OrganicAnimals extends Component {
         if (!this.state.expansion) {
             Animated.timing(this.state.exAnimation, {
                 toValue: 120,
-                duration: 800,
+                duration: 500,
                 useNativeDriver: false
             }).start();
             this.setState({
@@ -197,7 +226,7 @@ export default class OrganicAnimals extends Component {
         } else {
             Animated.timing(this.state.exAnimation, {
                 toValue: 40,
-                duration: 800,
+                duration: 500,
                 useNativeDriver: false
             }).start();
             this.setState({
@@ -227,23 +256,22 @@ export default class OrganicAnimals extends Component {
         }
     };
     // 유기동물 상세 정보
-    animalDefInfoOnPress = (data) => {
-        Animated.timing(this.state.opacity, {
-            toValue: 0,
+    animalDefInfoOnPress = (data, index) => {
+        Animated.timing(this.state.value, {
+            toValue: 1,
             duration: 1000,
             useNativeDriver: false
         }).start();
-        console.log(data)
+
+        console.log(index)
         this.setState({
-            detailData: data,
-            detaileModal: true,
-            openName: 'detail',
-            opacity: this.state.opacity.interpolate({
-                inputRange: [0, 1],
-                outputRange: [1, 0],
-            })
+            indexChk: index
+            // detailData: data,
+            // detaileModal: true,
+            // openName: 'detail',
         });
     }
+
     // 모달 화면
     modalRender = () => {
         if (this.state.openName === 'startDate') {
@@ -266,100 +294,126 @@ export default class OrganicAnimals extends Component {
     _animalRender = ({ item, index }) => {
         if (!isEmptyValid(item)) {
             return (
-                <ListItem data={item} onPress={this.animalDefInfoOnPress} />
+                <ListItem index={index} data={item} onPress={this.animalDefInfoOnPress} height={this.height} top={this.top} indexChk={this.state.indexChk} />
             )
         }
     }
 
     render() {
+        console.log(this.props)
         return (
             <>
-                <Animated.View style={[styles.container, { opacity: this.state.opacity }]}>
-                    <Animated.View style={[{ flexDirection: 'row', overflow: "hidden", borderWidth: 1, borderBottomWidth: 0 }, { height: this.state.exAnimation }]}>
-                        <View style={{ height: 120, flex: 1 }}>
-                            <View style={{ flex: 1, flexDirection: 'row', borderBottomWidth: 1 }}>
-                                <View style={{ flex: 1, backgroundColor: '#fff' }}>
-                                    <Picker
-                                        selectedValue={this.state.upkind}
-                                        style={styles.selectStyle}
-                                        onValueChange={(value) => this.inputOnChange('upkind', value)}
-                                    >
-                                        <Picker.Item label={`전 체`} value={0} />
-                                        <Picker.Item label={`강아지`} value={`417000`} />
-                                        <Picker.Item label={`고양이`} value={`422400`} />
-                                        <Picker.Item label={`기 타`} value={`429900`} />
-                                    </Picker>
+                <SafeAreaView style={{ flex: 1 }}>
+                    <Animated.View style={[styles.container]}>
+                        <Animated.View style={[{ flexDirection: 'row', overflow: "hidden", borderWidth: 1, borderBottomWidth: 0, marginLeft: 10, marginRight: 10, marginTop: 10 }, { height: this.state.exAnimation }]}>
+                            <View style={{ height: 120, flex: 1 }}>
+                                <View style={{ flex: 1, flexDirection: 'row', borderBottomWidth: 1 }}>
+                                    <View style={{ flex: 1, backgroundColor: '#fff' }}>
+                                        <Picker
+                                            selectedValue={this.state.upkind}
+                                            style={styles.selectStyle}
+                                            onValueChange={(value) => this.inputOnChange('upkind', value)}
+                                        >
+                                            <Picker.Item label={`전 체`} value={0} />
+                                            <Picker.Item label={`강아지`} value={`417000`} />
+                                            <Picker.Item label={`고양이`} value={`422400`} />
+                                            <Picker.Item label={`기 타`} value={`429900`} />
+                                        </Picker>
+                                    </View>
+                                    <View style={{ flex: 1, backgroundColor: '#fff' }}>
+                                        <Picker
+                                            selectedValue={this.state.kind}
+                                            style={styles.selectStyle}
+                                            onValueChange={(value) => this.inputOnChange('kind', value)}
+                                        >
+                                            {this.state.kindData.map((data, index) => {
+                                                return (
+                                                    <Picker.Item key={index} label={`${data.label}`} value={`${data.value}`} />
+                                                )
+                                            })}
+                                        </Picker>
+                                    </View>
                                 </View>
-                                <View style={{ flex: 1, backgroundColor: '#fff' }}>
-                                    <Picker
-                                        selectedValue={this.state.kind}
-                                        style={styles.selectStyle}
-                                        onValueChange={(value) => this.inputOnChange('kind', value)}
-                                    >
-                                        {this.state.kindData.map((data, index) => {
-                                            return (
-                                                <Picker.Item key={index} label={`${data.label}`} value={`${data.value}`} />
-                                            )
-                                        })}
-                                    </Picker>
+                                <View style={{ flex: 1, flexDirection: 'row', borderBottomWidth: 1 }}>
+                                    <View style={{ flex: 1, backgroundColor: '#fff' }}>
+                                        <Picker
+                                            selectedValue={this.state.sido}
+                                            style={styles.selectStyle}
+                                            onValueChange={(value) => this.inputOnChange('sido', value)}
+                                        >
+                                            {this.state.sidoData.map((data, index) => {
+                                                return (
+                                                    <Picker.Item key={index} label={`${data.label}`} value={`${data.value}`} />
+                                                )
+                                            })}
+                                        </Picker>
+                                    </View>
+                                    <View style={{ flex: 1, backgroundColor: '#fff' }}>
+                                        <Picker
+                                            selectedValue={this.state.sigungu}
+                                            style={styles.selectStyle}
+                                            onValueChange={(value) => this.inputOnChange('sigungu', value)}
+                                        >
+                                            {this.state.sigunguData.map((data, index) => {
+                                                return (
+                                                    <Picker.Item key={index} label={`${data.label}`} value={`${data.value}`} />
+                                                )
+                                            })}
+                                        </Picker>
+                                    </View>
+                                </View>
+                                <View style={{ flex: 1, flexDirection: 'row', backgroundColor: '#fff', alignItems: 'center' }}>
+                                    <View style={{ flex: 1, alignItems: 'center' }}>
+                                        <TouchableOpacity style={{ width: '100%', flex: 1, justifyContent: 'center', alignItems: 'center' }} activeOpacity={1} onPress={this.modalEvent('startDate')}>
+                                            <Text style={{ fontSize: 16 }}>{dateFomat(dateToString(this.state.startDate))}</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                    <Text>~</Text>
+                                    <View style={{ flex: 1, alignItems: 'center' }}>
+                                        <TouchableOpacity style={{ width: '100%', flex: 1, justifyContent: 'center', alignItems: 'center' }} activeOpacity={1} onPress={this.modalEvent('endDate')}>
+                                            <Text style={{ fontSize: 16 }}>{dateFomat(dateToString(this.state.endDate))}</Text>
+                                        </TouchableOpacity>
+                                    </View>
                                 </View>
                             </View>
-                            <View style={{ flex: 1, flexDirection: 'row', borderBottomWidth: 1 }}>
-                                <View style={{ flex: 1, backgroundColor: '#fff' }}>
-                                    <Picker
-                                        selectedValue={this.state.sido}
-                                        style={styles.selectStyle}
-                                        onValueChange={(value) => this.inputOnChange('sido', value)}
-                                    >
-                                        {this.state.sidoData.map((data, index) => {
-                                            return (
-                                                <Picker.Item key={index} label={`${data.label}`} value={`${data.value}`} />
-                                            )
-                                        })}
-                                    </Picker>
-                                </View>
-                                <View style={{ flex: 1, backgroundColor: '#fff' }}>
-                                    <Picker
-                                        selectedValue={this.state.sigungu}
-                                        style={styles.selectStyle}
-                                        onValueChange={(value) => this.inputOnChange('sigungu', value)}
-                                    >
-                                        {this.state.sigunguData.map((data, index) => {
-                                            return (
-                                                <Picker.Item key={index} label={`${data.label}`} value={`${data.value}`} />
-                                            )
-                                        })}
-                                    </Picker>
-                                </View>
-                            </View>
-                            <View style={{ flex: 1, flexDirection: 'row', backgroundColor: '#fff', alignItems: 'center' }}>
-                                <View style={{ flex: 1, alignItems: 'center' }}>
-                                    <TouchableOpacity style={{ width: '100%', flex: 1, justifyContent: 'center', alignItems: 'center' }} activeOpacity={1} onPress={this.modalEvent('startDate')}>
-                                        <Text style={{ fontSize: 16 }}>{dateFomat(dateToString(this.state.startDate))}</Text>
-                                    </TouchableOpacity>
-                                </View>
-                                <Text>~</Text>
-                                <View style={{ flex: 1, alignItems: 'center' }}>
-                                    <TouchableOpacity style={{ width: '100%', flex: 1, justifyContent: 'center', alignItems: 'center' }} activeOpacity={1} onPress={this.modalEvent('endDate')}>
-                                        <Text style={{ fontSize: 16 }}>{dateFomat(dateToString(this.state.endDate))}</Text>
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-                        </View>
-                        <Animated.View style={{ width: 80, height: this.state.exAnimation }}>
-                            <TouchableOpacity activeOpacity={1} style={{ flex: 1, width: 80, backgroundColor: '#ECB04D', alignItems: 'center', justifyContent: 'center', borderLeftWidth: 1 }} onPress={this.searchOnPress} >
-                                <Text style={{ color: '#fff' }}><Icon name='search' /> 검색</Text>
-                            </TouchableOpacity>
+                            <Animated.View style={{ width: 80, height: this.state.exAnimation }}>
+                                <TouchableOpacity activeOpacity={1} style={{ flex: 1, width: 80, backgroundColor: '#ECB04D', alignItems: 'center', justifyContent: 'center', borderLeftWidth: 1 }} onPress={this.searchOnPress} >
+                                    <Text style={{ color: '#fff' }}><Icon name='search' /> 검색</Text>
+                                </TouchableOpacity>
+                            </Animated.View>
                         </Animated.View>
+                        <TouchableOpacity activeOpacity={1} style={[styles.button, { marginBottom: 10, marginLeft: 10, marginRight: 10 }]} onPress={this.onExpansionPress}>
+                            <Text>{this.state.expansion ? '접기' : '열기'}</Text>
+                        </TouchableOpacity>
+                        <FlatList style={{ flex: 1, backgroundColor: '#f4f6fc' }} data={this.state.animalData} contentContainerStyle={{ padding: 10 }}
+                            renderItem={({ item }) => {
+                                return (
+                                    <TouchableOpacity activeOpacity={1} onPress={() => this.props.navigation.navigate('Details', { item })}>
+                                        <View style={{ flex: 1, flexDirection: 'row', height: 150, marginBottom: 10, borderRadius: 10, overflow: 'hidden' }}>
+                                            <SharedElement id={item.desertionNo} style={[{ width: 150, height: 150, position: 'absolute', top: 0, left: 0, zIndex: 10 }]}>
+                                                <Image source={{ uri: item.filename }} style={[{ width: 150, height: 150, position: 'absolute', top: 0, left: 0, zIndex: 10 }]} />
+                                            </SharedElement>
+                                            {/* <View style={[{ width: 150, height: 150, position: 'absolute', top: 0, left: 0, zIndex: 10 }]}>
+                                                    <SharedElement id={`item.${item.desertionNo}.image`} style={[{ width: '100%', height: '100%', resizeMode: 'cover' }]}>
+                                                        <Image source={{ uri: item.filename }} style={[{ width: '100%', height: '100%', resizeMode: 'cover' }]} />
+                                                    </SharedElement>
+                                                </View> */}
+                                            <View style={{ backgroundColor: '#fff', position: 'absolute', left: 150, width: '100%', height: '100%' }}>
+                                                <Text>{item.age}</Text>
+                                            </View>
+                                        </View>
+                                    </TouchableOpacity >
+                                )
+                            }}
+                            keyExtractor={(item, index) => { return index }} />
+                        <SharedElement id={`generate.bg`}>
+                            <View style={styles.bg} />
+                        </SharedElement>
+                        <Modal isVisible={this.state.modal}>
+                            {this.state.modal && this.modalRender()}
+                        </Modal>
                     </Animated.View>
-                    <TouchableOpacity activeOpacity={1} style={[styles.button, { marginBottom: 10 }]} onPress={this.onExpansionPress}>
-                        <Text>{this.state.expansion ? '접기' : '열기'}</Text>
-                    </TouchableOpacity>
-                    <FlatList style={{ flex: 1, backgroundColor: '#f4f6fc' }} data={this.state.animalData} renderItem={this._animalRender} keyExtractor={(item, index) => { return index }} />
-                    <Modal isVisible={this.state.modal}>
-                        {this.state.modal && this.modalRender()}
-                    </Modal>
-                </Animated.View>
+                </SafeAreaView>
                 {this.state.detaileModal && this.modalRender()}
             </>
         )
@@ -370,9 +424,9 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#f4f6fc',
-        paddingTop: 10,
-        paddingLeft: 10,
-        paddingRight: 10,
+        // paddingTop: 10,
+        // paddingLeft: 10,
+        // paddingRight: 10,
     },
     selectStyle: {
         flex: 1,
@@ -390,5 +444,14 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 1,
+    },
+    bg: {
+        position: 'absolute',
+        width: '100%',
+        height: WINDOW_HEIGHT,
+        backgroundColor: 'red',
+        transform: [{
+            translateY: (WINDOW_HEIGHT - 250) / 2
+        }]
     }
 })
