@@ -1,6 +1,6 @@
 import axios from 'axios'
 import React, { Component } from 'react'
-import { Text, View, StyleSheet, Animated, Button, TouchableOpacity, ScrollView, FlatList, Dimensions, SafeAreaView, Image } from 'react-native'
+import { Text, View, StyleSheet, Animated, Button, TouchableOpacity, ScrollView, FlatList, Dimensions, SafeAreaView, Image, TouchableWithoutFeedback } from 'react-native'
 import { SERVICE_KEY, SERVICE_URL, WIDTH } from '../Util/CommDef';
 import { isEmptyValid, prevMonthYear, dateToString, dateFomat } from '../Util/Util';
 import { Picker } from '@react-native-community/picker';
@@ -10,6 +10,7 @@ import Modal from 'react-native-modal';
 import ListItem from './Animals/ListItem';
 import DetailAnimals from './Modal/DetailAnimals';
 import {SharedElement} from 'react-navigation-shared-element';
+import TouchableScale from 'react-native-touchable-scale';
 
 const WINDOW_WIDTH = Dimensions.get('window').width;
 const WINDOW_HEIGHT = Dimensions.get('window').height;
@@ -388,20 +389,20 @@ export default class OrganicAnimals extends Component {
                         <FlatList style={{ flex: 1, backgroundColor: '#f4f6fc' }} data={this.state.animalData} contentContainerStyle={{ padding: 10 }}
                             renderItem={({ item, index }) => {
                                 return (
-                                    <TouchableOpacity activeOpacity={1} onPress={() => this.props.navigation.navigate('Details', { item })} style={{height:150, marginBottom:10}}>
-                                        <View style={{flex:1, borderRadius:16,overflow:'hidden'}}>
-                                            <SharedElement id={`item.${item.desertionNo}.image`} style={{height:150, position: 'absolute', resizeMode:'cover', borderTopLeftRadius:16, borderBottomLeftRadius:16}} >
-                                                <Image source={{ uri: item.popfile }} style={[{ height: 150, width:150, flex:1, resizeMode:'cover', borderTopLeftRadius:16, borderBottomLeftRadius:16}]} />
+                                    <TouchableWithoutFeedback onPress={() => this.props.navigation.navigate('Details', { item })} style={{height:150, marginBottom:10}}>
+                                        <View style={{flex:1, borderRadius:16,overflow:'hidden', marginBottom:10}}>
+                                            <SharedElement id={`item.${item.desertionNo}.image`} >
+                                                <Image source={{ uri: item.popfile }} style={[{ height: 150, width:150, resizeMode:'cover', borderTopLeftRadius:16, borderBottomLeftRadius:16}]} />
                                             </SharedElement>
                                             <View style={{ backgroundColor: '#fff', position: 'absolute', left: 150, width: '100%', height: '100%' }}>
                                                 <Text>{item.age}</Text>
                                             </View>
                                         </View>
-                                    </TouchableOpacity >
+                                    </TouchableWithoutFeedback >
                                 )
                             }}
                             keyExtractor={(item, index) => { return index }} />
-                        <SharedElement id={`generate.bg`}>
+                        <SharedElement id={`generate.bg`} >
                             <View style={styles.bg} />
                         </SharedElement>
                         <Modal isVisible={this.state.modal}>
@@ -443,7 +444,7 @@ const styles = StyleSheet.create({
     bg: {
         position: 'absolute',
         width: '100%',
-        height: WINDOW_HEIGHT,
+        height: 0,
         backgroundColor: 'red',
         transform: [{
             translateY: (WINDOW_HEIGHT - 250) / 2

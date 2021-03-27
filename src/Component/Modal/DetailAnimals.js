@@ -7,20 +7,25 @@ const WINDOW_WIDTH = Dimensions.get('window').width;
 const WINDOW_HEIGHT = Dimensions.get('window').height;
 
 export const DetailScreen = ({navigation, route}) => (
-    <View style={StyleSheet.absoluteFill}>
-        {/* <SharedElement id={`item.${route.params.item.desertionNo}.bg`} style={{ height: 300, borderBottomWidth: 1, backgroundColor: '#f4f6fc' }}>
-            <View style={{ height: 300, borderBottomWidth: 1, backgroundColor: '#f4f6fc' }} />
-        </SharedElement> */}
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-            <Text style={{ color: '#000', fontSize: 18 }}>Back</Text>
-        </TouchableOpacity>
-        <SharedElement id={`item.${route.params.item.desertionNo}.image`} style={{width:'100%', height: 300,position: 'absolute', top: 0, resizeMode: 'cover'}}>
-            <Image source={{ uri: route.params.item.popfile}} style={{ width:'100%', height: 300, resizeMode: 'cover', position: 'absolute', top: 0 }} />
-        </SharedElement>
-        <SharedElement id={`generate.bg`} style={styles.bg} >
-            <View style={styles.bg} />
-        </SharedElement>
-    </View>
+    <React.Fragment>
+        <View style={StyleSheet.absoluteFill}>
+            {/* <SharedElement id={`item.${route.params.item.desertionNo}.bg`} style={{ height: 300, borderBottomWidth: 1, backgroundColor: '#f4f6fc' }}>
+                <View style={{ height: 300, borderBottomWidth: 1, backgroundColor: '#f4f6fc' }} />
+            </SharedElement> */}
+            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                <Text style={{ color: '#000', fontSize: 18 }}>Back</Text>
+            </TouchableOpacity>
+            <SharedElement id={`item.${route.params.item.desertionNo}.image`} >
+                <Image source={{ uri: route.params.item.popfile}} style={[{ height: 300, width:180, resizeMode:'cover',}]} />
+            </SharedElement>
+            {/* <SharedElement id={`item.${route.params.item.desertionNo}.image`} style={{height:300}}>
+                <Image source={{ uri: route.params.item.popfile}} style={{ width:'100%', height: 300, resizeMode: 'cover' }} />
+            </SharedElement> */}
+            <SharedElement id={`generate.bg`} style={styles.bg} >
+                <View style={styles.bg} />
+            </SharedElement>
+        </View>
+    </React.Fragment>
 );
 
 const styles = StyleSheet.create({
@@ -48,6 +53,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         width: '100%',
         height: WINDOW_HEIGHT,
+        backgroundColor:'red',
         transform: [{
             translateY: (WINDOW_HEIGHT - 250) / 2
         }]

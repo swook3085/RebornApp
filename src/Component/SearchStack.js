@@ -5,9 +5,7 @@ import OrganicAnimals from './OrganicAnimals';
 import { createSharedElementStackNavigator } from 'react-navigation-shared-element';
 import { NavigationContainer } from '@react-navigation/native';
 import { DetailScreen } from './Modal/DetailAnimals';
-// import {enableScreens} from 'react-native-screens';
 
-// enableScreens();
 const Stack = createSharedElementStackNavigator();
 
 export default class SearChStack extends Component {
