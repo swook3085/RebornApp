@@ -57,7 +57,7 @@ export function TabBar({ state, descriptors, navigation }) {
             style={{ flex: 1, alignItems: "center" }}
           >
             {label === 'home' && <Icon name="home" color={isFocused ? '#0a6fb7' : '#fff'} size={25} />}
-            {label === 'search' && <Icon name="search" color={isFocused ? '#0a6fb7' : '#fff'} size={25} />}
+            {label === 'Search' && <Icon name="search" color={isFocused ? '#0a6fb7' : '#fff'} size={25} />}
             {label === 'story' && <MaterialIcons name="article" color={isFocused ? '#0a6fb7' : '#fff'} size={25} />}
           </TouchableOpacity>
         );

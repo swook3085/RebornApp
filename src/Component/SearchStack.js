@@ -2,17 +2,23 @@ import React, { Component } from 'react'
 import { Text, View } from 'react-native'
 import { createStackNavigator } from '@react-navigation/stack';
 import OrganicAnimals from './OrganicAnimals';
-import DetailAnimals from './Modal/DetailAnimals';
+import { createSharedElementStackNavigator } from 'react-navigation-shared-element';
+import { NavigationContainer } from '@react-navigation/native';
+import { DetailScreen } from './Modal/DetailAnimals';
+// import {enableScreens} from 'react-native-screens';
 
-const SearchStack = createStackNavigator();
+// enableScreens();
+const Stack = createSharedElementStackNavigator();
 
 export default class SearChStack extends Component {
     render() {
         return (
-            <SearchStack.Navigator>
-                <SearchStack.Screen name="search" component={OrganicAnimals} options={{ headerShown: false }} />
-                <SearchStack.Screen name="Details" component={DetailAnimals} options={{ headerShown: false }} />
-            </SearchStack.Navigator>
+            <>
+                <Stack.Navigator>
+                    <Stack.Screen name="Search" component={OrganicAnimals} options={{ headerShown: false }} />
+                    <Stack.Screen name="Details" component={DetailScreen} options={{ headerShown: false, gestureEnabled : false }}  />
+                </Stack.Navigator>
+            </>
         )
     }
 }
