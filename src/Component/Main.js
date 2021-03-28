@@ -2,12 +2,11 @@ import React, { Component } from 'react'
 import { Text, View } from 'react-native'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Home from './Home';
-import Header from './Header';
-import Detail from './Modal/DetailAnimals';
+import Header from './Layout/Header';
 import Story from './Story';
 import { NavigationContainer } from '@react-navigation/native';
-import { TabBar } from './TabBar';
-import SearChStack from './SearchStack';
+import { TabBar } from './Layout/TabBar';
+import SearChStack from './Animals/SearchStack';
 
 const Tab = createBottomTabNavigator();
 

@@ -1,14 +1,12 @@
 import axios from 'axios'
 import React, { Component } from 'react'
 import { Text, View, StyleSheet, Animated, Button, TouchableOpacity, ScrollView, FlatList, Dimensions, SafeAreaView, Image, TouchableWithoutFeedback } from 'react-native'
-import { SERVICE_KEY, SERVICE_URL, WIDTH } from '../Util/CommDef';
-import { isEmptyValid, prevMonthYear, dateToString, dateFomat } from '../Util/Util';
+import { SERVICE_KEY, SERVICE_URL, WIDTH } from '../../Util/CommDef';
+import { isEmptyValid, prevMonthYear, dateToString, dateFomat } from '../../Util/Util';
 import { Picker } from '@react-native-community/picker';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import Date from './Modal/DatePicker';
+import Date from '../Modal/DatePicker';
 import Modal from 'react-native-modal';
-import ListItem from './Animals/ListItem';
-import DetailAnimals from './Modal/DetailAnimals';
 import {SharedElement} from 'react-navigation-shared-element';
 import TouchableScale from 'react-native-touchable-scale';
 
@@ -160,7 +158,7 @@ export default class OrganicAnimals extends Component {
             page: 1,
             upkind: upkind,                                    // 축종
             kind: kind,                                        // 품종
-            sidoorgCd: this.state.sido,                              // 시도 데이터 num default 전국 - 0
+            sidoorgCd: this.state.sido,                        // 시도 데이터 num default 전국 - 0
             sigunguorgCd: sigunguorgCd,                        // 시군구 데이터 num default 모든지역 - 0
             startDate: dateToString(this.state.startDate),     // 시작 날짜
             endDate: dateToString(this.state.endDate)          // 종료 날짜
@@ -172,6 +170,13 @@ export default class OrganicAnimals extends Component {
                 this.setState({
                     animalData: res.data.response.body.items.item,
                 });
+                res.data.response.body.items.item.map((item) => {
+                    Image.getSize(item.popfile, (width, height) => {
+                        item.width = width;
+                        item.height = height;
+                        // console.log(`width : ${width}  -------------- height : ${height}`)
+                    });
+                })
             }
         });
     }
@@ -389,19 +394,19 @@ export default class OrganicAnimals extends Component {
                         <FlatList style={{ flex: 1, backgroundColor: '#f4f6fc' }} data={this.state.animalData} contentContainerStyle={{ padding: 10 }}
                             renderItem={({ item, index }) => {
                                 return (
-                                    <TouchableWithoutFeedback onPress={() => this.props.navigation.navigate('Details', { item })} style={{height:150, marginBottom:10}}>
-                                        <View style={{flex:1, borderRadius:16,overflow:'hidden', marginBottom:10}}>
-                                            <SharedElement id={`item.${item.desertionNo}.image`} >
-                                                <Image source={{ uri: item.popfile }} style={[{ height: 150, width:150, resizeMode:'cover', borderTopLeftRadius:16, borderBottomLeftRadius:16}]} />
+                                    <TouchableOpacity activeOpacity={1} onPress={() => this.props.navigation.navigate('Details', { item, index })} style={{height:120, marginBottom:10}}>
+                                        <View style={{ flex:1, borderRadius:16,overflow:'hidden'}}>
+                                            <SharedElement id={`item.${index}.image`} style={[{ height: '100%', width: 140, borderBottomLeftRadius:16, borderTopLeftRadius:16}]}>
+                                                <Image source={{ uri: item.popfile }} resizeMode='cover' style={[{ height: '100%', width:140, borderBottomLeftRadius:16, borderTopLeftRadius:16}]} />
                                             </SharedElement>
-                                            <View style={{ backgroundColor: '#fff', position: 'absolute', left: 150, width: '100%', height: '100%' }}>
+                                            <View style={{ backgroundColor: '#fff', position: 'absolute', left: 140, width: '100%', height: '100%' }}>
                                                 <Text>{item.age}</Text>
                                             </View>
                                         </View>
-                                    </TouchableWithoutFeedback >
+                                    </TouchableOpacity >
                                 )
                             }}
-                            keyExtractor={(item, index) => { return index }} />
+                            keyExtractor={(item, index) => index.toString()} />
                         <SharedElement id={`generate.bg`} >
                             <View style={styles.bg} />
                         </SharedElement>
@@ -410,7 +415,7 @@ export default class OrganicAnimals extends Component {
                         </Modal>
                     </Animated.View>
                 </SafeAreaView>
-                {this.state.detaileModal && this.modalRender()}
+
             </>
         )
     }
@@ -449,5 +454,5 @@ const styles = StyleSheet.create({
         transform: [{
             translateY: (WINDOW_HEIGHT - 250) / 2
         }]
-    }
+    },
 })
