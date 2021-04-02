@@ -1,12 +1,12 @@
 import React from 'react'
-import { Text, View, TouchableOpacity } from 'react-native'
+import { Text, View, TouchableOpacity, StatusBar } from 'react-native'
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 export function TabBar({ state, descriptors, navigation }) {
   return (
     <View style={{
-      flexDirection: 'row', backgroundColor: "#ECB04D", height: 60, borderRadius: 15, margin: 10, justifyContent: "center", alignItems: "center", shadowColor: "#000",
+      flexDirection: 'row', backgroundColor: "#ECB04D", height: 60, borderRadius: 15, margin: 10, marginBottom: StatusBar.currentHeight, justifyContent: "center", alignItems: "center", shadowColor: "#000",
       shadowOffset: {
         width: 0,
         height: 2,
