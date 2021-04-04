@@ -8,24 +8,28 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import Date from '../Modal/DatePicker';
 import Modal from 'react-native-modal';
 import { SharedElement } from 'react-navigation-shared-element';
-import dog from '../../resource/images/happydog.png';
-import cat from '../../resource/images/happycat.png';
 import Header from '../Layout/Header';
+import AnimalList from './AnimalList';
+
 
 const WINDOW_WIDTH = Dimensions.get('window').width;
 const WINDOW_HEIGHT = Dimensions.get('window').height;
 
+
 export default class OrganicAnimals extends Component {
     constructor(props) {
-        super(props);
+        super(props)
+        this.scrollY = new Animated.Value(0);
         var startDate = prevMonthYear(3);
         var endDate = prevMonthYear(0);
         this.state = {
+            refreshing: false,
             page: 1,                                                                // 페이지                                                                                           
             modal: false,                                                         // 모달창 열고 닫기
             openName: '',                                                       // 모달 이름
             expansionAnimate: new Animated.Value(40),
             expansion: false,                                                   // 확장 버튼 열고 접기
+            offsetChk : false,                                                  // 검색창확인
             sidoDataBody: [],                                                   // 시도 전체 정보
             sidoData: [],                                                           // 시도 정보
             sido: '6110000',                                                     // 시도 값
@@ -157,12 +161,14 @@ export default class OrganicAnimals extends Component {
     // 유기동물 조회
     _getAnimalData = async () => {
         var data = await this.animalValid();
+        console.log(data)
         await axios.get(`${SERVICE_URL}abandonmentPublic?upkind=${data.upkind}&kind=${data.kind}&upr_cd=${data.sidoorgCd}&org_cd=${data.sigunguorgCd}&bgnde=${data.startDate}&endde=${data.endDate}&pageNo=${data.page}&numOfRows=20&serviceKey=${SERVICE_KEY}`).then((res) => {
             console.log(res.data.response.body);
             if (res.status === 200 && !isEmptyValid(res.data.response.body) && !isEmptyValid(res.data.response.body.items) && !isEmptyValid(res.data.response.body.items.item)) {
                 this.setState({
                     animalData: this.state.animalData.concat(res.data.response.body.items.item),
-                    page: this.state.page + 1
+                    page: this.state.page + 1,
+                    refreshing: false
                 });
                 res.data.response.body.items.item.map((item) => {
                     Image.getSize(item.popfile, (width, height) => {
@@ -213,14 +219,25 @@ export default class OrganicAnimals extends Component {
                 expansion: true
             })
         } else {
-            Animated.timing(this.state.expansionAnimate, {
-                toValue: 40,
-                duration: 500,
-                useNativeDriver: false
-            }).start();
-            this.setState({
-                expansion: false
-            })
+            if (this.state.offsetChk) {
+                Animated.timing(this.state.expansionAnimate, {
+                    toValue: 0,
+                    duration: 500,
+                    useNativeDriver: false
+                }).start();
+                this.setState({
+                    expansion: false
+                })
+            } else {
+                Animated.timing(this.state.expansionAnimate, {
+                    toValue: 40,
+                    duration: 500,
+                    useNativeDriver: false
+                }).start();
+                this.setState({
+                    expansion: false
+                })
+            }
         }
     }
     // 시작일 종료일 변경 확인
@@ -244,21 +261,27 @@ export default class OrganicAnimals extends Component {
             });
         }
     };
-    // 유기동물 상세 정보
-    animalDefInfoOnPress = (data, index) => {
-        Animated.timing(this.state.value, {
-            toValue: 1,
-            duration: 1000,
-            useNativeDriver: false
-        }).start();
-
-        console.log(index)
+    _handleRefresh = () => {
         this.setState({
-            indexChk: index
-            // detailData: data,
-            // detaileModal: true,
-            // openName: 'detail',
-        });
+            animalData : [],
+            refreshing: true,
+            page: 1,
+        }, this._getAnimalData);
+      }
+    scrollEvent = (e) => {
+        // if (e.nativeEvent.contentOffset.y > 20) {
+        //     Animated.timing(this.state.expansionAnimate, {
+        //         toValue: 0,
+        //         duration: 100,
+        //         useNativeDriver: false
+        //     }).start();
+        // } else {
+        //     Animated.timing(this.state.expansionAnimate, {
+        //         toValue: 40,
+        //         duration: 100,
+        //         useNativeDriver: false
+        //     }).start();
+        // }
     }
 
     // 모달 화면
@@ -274,17 +297,8 @@ export default class OrganicAnimals extends Component {
             )
         }
     }
-    // 유기동물 리스트
-    _animalRender = ({ item, index }) => {
-        if (!isEmptyValid(item)) {
-            return (
-                <ListItem index={index} data={item} onPress={this.animalDefInfoOnPress} />
-            )
-        }
-    }
 
     render() {
-        console.log(this.props)
         return (
             <>
                 <SafeAreaView style={{ flex: 1 }}>
@@ -297,7 +311,7 @@ export default class OrganicAnimals extends Component {
                                         <Picker
                                             selectedValue={this.state.upkind}
                                             style={styles.selectStyle}
-                                            mode={'dropdown'}
+                                            mode={'dialog'}
                                             onValueChange={(value) => this.inputOnChange('upkind', value)}
                                         >
                                             <Picker.Item label={`전 체`} value={0} />
@@ -310,7 +324,7 @@ export default class OrganicAnimals extends Component {
                                         <Picker
                                             selectedValue={this.state.kind}
                                             style={styles.selectStyle}
-                                            mode={'dropdown'}
+                                            mode={'dialog'}
                                             onValueChange={(value) => this.inputOnChange('kind', value)}
                                         >
                                             {this.state.kindData.map((data, index) => {
@@ -326,7 +340,7 @@ export default class OrganicAnimals extends Component {
                                         <Picker
                                             selectedValue={this.state.sido}
                                             style={styles.selectStyle}
-                                            mode={'dropdown'}
+                                            mode={'dialog'}
                                             onValueChange={(value) => this.inputOnChange('sido', value)}
                                         >
                                             {this.state.sidoData.map((data, index) => {
@@ -340,7 +354,7 @@ export default class OrganicAnimals extends Component {
                                         <Picker
                                             selectedValue={this.state.sigungu}
                                             style={styles.selectStyle}
-                                            mode={'dropdown'}
+                                            mode={'dialog'}
                                             onValueChange={(value) => this.inputOnChange('sigungu', value)}
                                         >
                                             {this.state.sigunguData.map((data, index) => {
@@ -371,55 +385,10 @@ export default class OrganicAnimals extends Component {
                                 </TouchableOpacity>
                             </Animated.View>
                         </Animated.View>
-                        <TouchableOpacity activeOpacity={1} style={[styles.button, { marginBottom: 10, marginLeft: 10, marginRight: 10, backgroundColor: '#fff' }]} onPress={this.onExpansionPress}>
+                        <TouchableOpacity activeOpacity={1} style={[styles.button, {marginBottom: 10, marginLeft: 10, marginRight: 10, backgroundColor: '#fff' }]} onPress={this.onExpansionPress}>
                             <Text>{this.state.expansion ? '접기' : '열기'}</Text>
                         </TouchableOpacity>
-                        <FlatList style={{ flex: 1, backgroundColor: '#f4f6fc' }} data={this.state.animalData} contentContainerStyle={{ padding: 10 }}
-                            renderItem={({ item, index }) => {
-                                return (
-                                    <TouchableOpacity activeOpacity={1} onPress={() => this.props.navigation.navigate('Details', { item, index })} style={{ height: 130, marginBottom: 10 }}>
-                                        <View style={{ flex: 1, borderRadius: 16, overflow: 'hidden', alignItems: 'center' }} >
-                                            <SharedElement id={`item.${index}.image`} style={[{ height: '100%', width: 140, borderBottomLeftRadius: 16, borderTopLeftRadius: 16, position: 'absolute', left: 0 }]} collapsable={false}>
-                                                <Image source={{ uri: item.popfile }} resizeMode='cover' style={[{ height: '100%', width: 140, borderBottomLeftRadius: 16, borderTopLeftRadius: 16 }]} />
-                                            </SharedElement>
-                                            <SharedElement id={`item.${index}.statebg`} style={{ borderBottomLeftRadius: 16, position: 'absolute', left: 0, bottom: 0 }}>
-                                                <View style={{ width: 140, height: 30, backgroundColor: '#000', opacity: 0.5, borderBottomLeftRadius: 16 }} />
-                                            </SharedElement>
-                                            <SharedElement id={`item.${index}.stateTx`} style={{ color: '#fff', position: 'absolute', left: 25, width: 90, bottom: 5, fontSize: 12 }}>
-                                                <Text style={{ color: '#fff', textAlign: 'center', fontSize: 12 }}>{item.processState}</Text>
-                                            </SharedElement>
-                                            {/* <Text style={{ color: '#fff', position: 'absolute', left: 35, width: 70, bottom: 5, textAlign: 'center', fontSize: 12 }}>{item.processState}</Text> */}
-                                            <View style={{ backgroundColor: '#fff', position: 'absolute', left: 140, width: '100%', height: '100%' }}>
-                                                <View style={{ flex: 1, justifyContent: 'center', paddingLeft: 10, paddingTop: 5 }}>
-                                                    {item.kindCd.indexOf('개') > -1 && <Image source={dog} resizeMode={'cover'} style={{ width: 20, height: 20 }} />}
-                                                    {item.kindCd.indexOf('고양이') > -1 && <Image source={cat} resizeMode={'cover'} style={{ width: 20, height: 20 }} />}
-                                                </View>
-                                                <View style={{ flex: 3, padding: 10, paddingTop: 0 }}>
-                                                    <View style={{ flexDirection: 'row' }}>
-                                                        <Text>품종 :  </Text>
-                                                        <Text>{item.kindCd}</Text>
-                                                    </View>
-                                                    <View style={{ flexDirection: 'row' }}>
-                                                        <Text>등록일 :  </Text>
-                                                        <Text>{dateFomat(item.happenDt.toString())}</Text>
-                                                    </View>
-                                                    <View style={{ flexDirection: 'row' }}>
-                                                        <Text>지역 :  </Text>
-                                                        <Text>{item.orgNm}</Text>
-                                                    </View>
-                                                    <View style={{ flexDirection: 'row' }}>
-                                                        <Text>보호소 :  </Text>
-                                                        <Text>{item.careNm}</Text>
-                                                    </View>
-                                                </View>
-                                            </View>
-                                        </View>
-                                    </TouchableOpacity >
-                                )
-                            }}
-                            keyExtractor={(item, index) => index.toString()}
-                            onEndReached={this._handleLoadMore}
-                            onEndReachedThreshold={1} />
+                        <AnimalList data={this.state.animalData} initData={this._handleLoadMore} refresh={this._handleRefresh} state={this.state}/>
                         <SharedElement id={`generate.bg`}>
                             <View style={styles.bg} />
                         </SharedElement>
@@ -438,9 +407,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#f4f6fc',
-        // paddingTop: 10,
-        // paddingLeft: 10,
-        // paddingRight: 10,
     },
     selectStyle: {
         flex: 1,
