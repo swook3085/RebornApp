@@ -29,7 +29,7 @@ export default class OrganicAnimals extends Component {
             openName: '',                                                       // 모달 이름
             expansionAnimate: new Animated.Value(40),
             expansion: false,                                                   // 확장 버튼 열고 접기
-            offsetChk : false,                                                  // 검색창확인
+            offsetChk: false,                                                  // 검색창확인
             sidoDataBody: [],                                                   // 시도 전체 정보
             sidoData: [],                                                           // 시도 정보
             sido: '6110000',                                                     // 시도 값
@@ -263,11 +263,11 @@ export default class OrganicAnimals extends Component {
     };
     _handleRefresh = () => {
         this.setState({
-            animalData : [],
+            animalData: [],
             refreshing: true,
             page: 1,
         }, this._getAnimalData);
-      }
+    }
     scrollEvent = (e) => {
         // if (e.nativeEvent.contentOffset.y > 20) {
         //     Animated.timing(this.state.expansionAnimate, {
@@ -301,103 +301,100 @@ export default class OrganicAnimals extends Component {
     render() {
         return (
             <>
-                <SafeAreaView style={{ flex: 1 }}>
-                    <Header />
-                    <Animated.View style={[styles.container]}>
-                        <Animated.View style={[{ flexDirection: 'row', overflow: "hidden", borderWidth: 1, borderBottomWidth: 0, marginLeft: 10, marginRight: 10, marginTop: 10 }, { height: this.state.expansionAnimate }]}>
-                            <View style={{ height: 120, flex: 1 }}>
-                                <View style={{ flex: 1, flexDirection: 'row', borderBottomWidth: 1 }}>
-                                    <View style={{ flex: 1, backgroundColor: '#fff' }}>
-                                        <Picker
-                                            selectedValue={this.state.upkind}
-                                            style={styles.selectStyle}
-                                            mode={'dialog'}
-                                            onValueChange={(value) => this.inputOnChange('upkind', value)}
-                                        >
-                                            <Picker.Item label={`전 체`} value={0} />
-                                            <Picker.Item label={`강아지`} value={`417000`} />
-                                            <Picker.Item label={`고양이`} value={`422400`} />
-                                            <Picker.Item label={`기 타`} value={`429900`} />
-                                        </Picker>
-                                    </View>
-                                    <View style={{ flex: 1, backgroundColor: '#fff' }}>
-                                        <Picker
-                                            selectedValue={this.state.kind}
-                                            style={styles.selectStyle}
-                                            mode={'dialog'}
-                                            onValueChange={(value) => this.inputOnChange('kind', value)}
-                                        >
-                                            {this.state.kindData.map((data, index) => {
-                                                return (
-                                                    <Picker.Item key={index} label={`${data.label}`} value={`${data.value}`} />
-                                                )
-                                            })}
-                                        </Picker>
-                                    </View>
+                <Animated.View style={[styles.container]}>
+                    <Animated.View style={[{ flexDirection: 'row', overflow: "hidden", borderWidth: 1, borderBottomWidth: 0, marginLeft: 10, marginRight: 10, marginTop: 10 }, { height: this.state.expansionAnimate }]}>
+                        <View style={{ height: 120, flex: 1 }}>
+                            <View style={{ flex: 1, flexDirection: 'row', borderBottomWidth: 1 }}>
+                                <View style={{ flex: 1, backgroundColor: '#fff' }}>
+                                    <Picker
+                                        selectedValue={this.state.upkind}
+                                        style={styles.selectStyle}
+                                        mode={'dialog'}
+                                        onValueChange={(value) => this.inputOnChange('upkind', value)}
+                                    >
+                                        <Picker.Item label={`전 체`} value={0} />
+                                        <Picker.Item label={`강아지`} value={`417000`} />
+                                        <Picker.Item label={`고양이`} value={`422400`} />
+                                        <Picker.Item label={`기 타`} value={`429900`} />
+                                    </Picker>
                                 </View>
-                                <View style={{ flex: 1, flexDirection: 'row', borderBottomWidth: 1 }}>
-                                    <View style={{ flex: 1, backgroundColor: '#fff' }}>
-                                        <Picker
-                                            selectedValue={this.state.sido}
-                                            style={styles.selectStyle}
-                                            mode={'dialog'}
-                                            onValueChange={(value) => this.inputOnChange('sido', value)}
-                                        >
-                                            {this.state.sidoData.map((data, index) => {
-                                                return (
-                                                    <Picker.Item key={index} label={`${data.label}`} value={`${data.value}`} />
-                                                )
-                                            })}
-                                        </Picker>
-                                    </View>
-                                    <View style={{ flex: 1, backgroundColor: '#fff' }}>
-                                        <Picker
-                                            selectedValue={this.state.sigungu}
-                                            style={styles.selectStyle}
-                                            mode={'dialog'}
-                                            onValueChange={(value) => this.inputOnChange('sigungu', value)}
-                                        >
-                                            {this.state.sigunguData.map((data, index) => {
-                                                return (
-                                                    <Picker.Item key={index} label={`${data.label}`} value={`${data.value}`} />
-                                                )
-                                            })}
-                                        </Picker>
-                                    </View>
-                                </View>
-                                <View style={{ flex: 1, flexDirection: 'row', backgroundColor: '#fff', alignItems: 'center' }}>
-                                    <View style={{ flex: 1, alignItems: 'center' }}>
-                                        <TouchableOpacity style={{ width: '100%', flex: 1, justifyContent: 'center', alignItems: 'center' }} activeOpacity={1} onPress={this.modalEvent('startDate')}>
-                                            <Text style={{ fontSize: 16 }}>{dateFomat(dateToString(this.state.startDate))}</Text>
-                                        </TouchableOpacity>
-                                    </View>
-                                    <Text>~</Text>
-                                    <View style={{ flex: 1, alignItems: 'center' }}>
-                                        <TouchableOpacity style={{ width: '100%', flex: 1, justifyContent: 'center', alignItems: 'center' }} activeOpacity={1} onPress={this.modalEvent('endDate')}>
-                                            <Text style={{ fontSize: 16 }}>{dateFomat(dateToString(this.state.endDate))}</Text>
-                                        </TouchableOpacity>
-                                    </View>
+                                <View style={{ flex: 1, backgroundColor: '#fff' }}>
+                                    <Picker
+                                        selectedValue={this.state.kind}
+                                        style={styles.selectStyle}
+                                        mode={'dialog'}
+                                        onValueChange={(value) => this.inputOnChange('kind', value)}
+                                    >
+                                        {this.state.kindData.map((data, index) => {
+                                            return (
+                                                <Picker.Item key={index} label={`${data.label}`} value={`${data.value}`} />
+                                            )
+                                        })}
+                                    </Picker>
                                 </View>
                             </View>
-                            <Animated.View style={{ width: 80, height: this.state.expansionAnimate }}>
-                                <TouchableOpacity activeOpacity={1} style={{ flex: 1, width: 80, backgroundColor: '#ECB04D', alignItems: 'center', justifyContent: 'center', borderLeftWidth: 1 }} onPress={this.searchOnPress} >
-                                    <Text style={{ color: '#fff' }}><Icon name='search' /> 검색</Text>
-                                </TouchableOpacity>
-                            </Animated.View>
+                            <View style={{ flex: 1, flexDirection: 'row', borderBottomWidth: 1 }}>
+                                <View style={{ flex: 1, backgroundColor: '#fff' }}>
+                                    <Picker
+                                        selectedValue={this.state.sido}
+                                        style={styles.selectStyle}
+                                        mode={'dialog'}
+                                        onValueChange={(value) => this.inputOnChange('sido', value)}
+                                    >
+                                        {this.state.sidoData.map((data, index) => {
+                                            return (
+                                                <Picker.Item key={index} label={`${data.label}`} value={`${data.value}`} />
+                                            )
+                                        })}
+                                    </Picker>
+                                </View>
+                                <View style={{ flex: 1, backgroundColor: '#fff' }}>
+                                    <Picker
+                                        selectedValue={this.state.sigungu}
+                                        style={styles.selectStyle}
+                                        mode={'dialog'}
+                                        onValueChange={(value) => this.inputOnChange('sigungu', value)}
+                                    >
+                                        {this.state.sigunguData.map((data, index) => {
+                                            return (
+                                                <Picker.Item key={index} label={`${data.label}`} value={`${data.value}`} />
+                                            )
+                                        })}
+                                    </Picker>
+                                </View>
+                            </View>
+                            <View style={{ flex: 1, flexDirection: 'row', backgroundColor: '#fff', alignItems: 'center' }}>
+                                <View style={{ flex: 1, alignItems: 'center' }}>
+                                    <TouchableOpacity style={{ width: '100%', flex: 1, justifyContent: 'center', alignItems: 'center' }} activeOpacity={1} onPress={this.modalEvent('startDate')}>
+                                        <Text style={{ fontSize: 16 }}>{dateFomat(dateToString(this.state.startDate))}</Text>
+                                    </TouchableOpacity>
+                                </View>
+                                <Text>~</Text>
+                                <View style={{ flex: 1, alignItems: 'center' }}>
+                                    <TouchableOpacity style={{ width: '100%', flex: 1, justifyContent: 'center', alignItems: 'center' }} activeOpacity={1} onPress={this.modalEvent('endDate')}>
+                                        <Text style={{ fontSize: 16 }}>{dateFomat(dateToString(this.state.endDate))}</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        </View>
+                        <Animated.View style={{ width: 80, height: this.state.expansionAnimate }}>
+                            <TouchableOpacity activeOpacity={1} style={{ flex: 1, width: 80, backgroundColor: '#ECB04D', alignItems: 'center', justifyContent: 'center', borderLeftWidth: 1 }} onPress={this.searchOnPress} >
+                                <Text style={{ color: '#fff' }}><Icon name='search' /> 검색</Text>
+                            </TouchableOpacity>
                         </Animated.View>
-                        <TouchableOpacity activeOpacity={1} style={[styles.button, {marginBottom: 10, marginLeft: 10, marginRight: 10, backgroundColor: '#fff' }]} onPress={this.onExpansionPress}>
-                            <Text>{this.state.expansion ? '접기' : '열기'}</Text>
-                        </TouchableOpacity>
-                        <AnimalList data={this.state.animalData} initData={this._handleLoadMore} refresh={this._handleRefresh} state={this.state}/>
-                        <SharedElement id={`generate.bg`}>
-                            <View style={styles.bg} />
-                        </SharedElement>
-                        <Modal isVisible={this.state.modal}>
-                            {this.state.modal && this.modalRender()}
-                        </Modal>
                     </Animated.View>
-                </SafeAreaView>
-
+                    <TouchableOpacity activeOpacity={1} style={[styles.button, { marginBottom: 10, marginLeft: 10, marginRight: 10, backgroundColor: '#fff' }]} onPress={this.onExpansionPress}>
+                        <Text>{this.state.expansion ? '접기' : '열기'}</Text>
+                    </TouchableOpacity>
+                    <AnimalList data={this.state.animalData} initData={this._handleLoadMore} refresh={this._handleRefresh} state={this.state} />
+                    {/* <SharedElement id={`generate.bg`}>
+                            <View style={styles.bg} />
+                        </SharedElement> */}
+                    <Modal isVisible={this.state.modal} useNativeDriver={true}
+                        hideModalContentWhileAnimating={true} deviceHeight={Dimensions.get('screen').height} deviceWidth={Dimensions.get('screen').width} customBackdrop={<View style={{ width: '100%', backgroundColor: 'red', height: 1400, padding: 0, margin: 0, position: 'absolute', top: 0, zIndex: 30 }} />}>
+                        {this.modalRender()}
+                    </Modal>
+                </Animated.View>
             </>
         )
     }

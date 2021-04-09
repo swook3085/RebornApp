@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Text, View, StyleSheet } from 'react-native'
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import Header from './Layout/Header';
+
 export default class Home extends Component {
     static navigationOption = {
         tabBarIcon: () => { return <Icon name="home"></Icon> }
@@ -9,7 +9,6 @@ export default class Home extends Component {
     render() {
         return (
             <>
-                <Header />
                 <View style={styles.container}>
                     <Text>Home Screen </Text>
                 </View>

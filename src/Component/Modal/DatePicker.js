@@ -1,11 +1,11 @@
 import React, { Component } from 'react'
-import { Text, View, TouchableOpacity, TextInput, StyleSheet } from 'react-native'
+import { Text, View, TouchableOpacity, TextInput, StyleSheet, Dimensions } from 'react-native'
 import DatePicker from 'react-native-date-picker'
 
 export default class DatePickerModal extends Component {
     render() {
         return (
-            <View style={styles.container}>
+            <>
                 <TouchableOpacity style={styles.background} activeOpacity={1} onPress={this.props.modal} />
                 <View style={styles.modal}>
                     <View style={styles.title}>
@@ -22,21 +22,16 @@ export default class DatePickerModal extends Component {
                         </Text>
                     </TouchableOpacity>
                 </View>
-            </View>
+            </>
         )
     }
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex:1,
-        justifyContent :'center'
-    },
     background: {
         position: 'absolute',
         height: '100%',
         width: '100%',
-        overflow: 'hidden'
     },
     modal: {
         borderRadius: 10,

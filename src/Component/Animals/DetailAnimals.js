@@ -16,7 +16,6 @@ export default () => {
   const navigation = useNavigation();
   const { item } = route.params;
   const { index } = route.params;
-
   var width = item.width * 0.45;
   var height = item.height * 0.45;
 
@@ -28,16 +27,16 @@ export default () => {
   }
 
   const goAlert = () =>
-     Alert.alert(              
-       '',
+    Alert.alert(
+      '',
       `${item.careNm}로 문의하겠습니까?`,
-      [                             
+      [
         {
-          text: "아니요", 
-          onPress: () => console.log("cancle"), 
+          text: "아니요",
+          onPress: () => console.log("cancle"),
           style: "cancel"
         },
-        { text: "네", onPress: onCallPress }, 
+        { text: "네", onPress: onCallPress },
       ],
       { cancelable: false }
     );
@@ -64,67 +63,68 @@ export default () => {
           />
         </SharedElement>
         <SharedElement id={`item.${index}.statebg`} style={{ width: WINDOW_WIDTH }}>
-          <View style={{ width: WINDOW_WIDTH, height: 50, position: 'absolute', backgroundColor: '#000', opacity: 0.4, top: -50 }} />
+          <View style={{ width: WINDOW_WIDTH, height: 40, position: 'absolute', backgroundColor: '#000', opacity: 0.4, top: -40 }} />
         </SharedElement>
-        <SharedElement id={`item.${index}.stateTx`} style={{ color: '#fff', position: 'absolute', width: 120, top: height + 52.5, fontSize: 18 }}>
+        <SharedElement id={`item.${index}.stateTx`} style={{ color: '#fff', position: 'absolute', width: 120, top: height + 62.5, fontSize: 18 }}>
           <Text style={{ color: '#fff', textAlign: 'center', fontSize: 18 }}>{item.processState}</Text>
         </SharedElement>
-        <SharedElement id={`generate.bg`} style={[{
-          height: WINDOW_HEIGHT - (height + 185), top: height + 85
-        }, styles.bg]} >
-            <View style={[{ height: WINDOW_HEIGHT - (height + 130), borderTopLeftRadius: 16, borderTopRightRadius: 16, }]}>
-              <Animatable.View style={{justifyContent:'center', marginVertical:20, marginTop:0, marginBottom:10}} animation='fadeInLeft' delay={DURATION + 1 * 100} >
-                <Text style={{fontSize:20}}>{item.kindCd}</Text>
-                <Text>{item.sexCd === 'M' ? '수컷' : '암컷'}/{item.colorCd}/{item.age}/{item.weight}</Text>
-              </Animatable.View>
-              <Animatable.View animation='fadeInUp' delay={DURATION + 1 * 100} style={{marginBottom:5}}>
-                <Text style={styles.notiTitle}>공고번호</Text>
-                <View style={{flexDirection:'row', alignItems:'center'}}>
-                  <View style={{width:10, height:10, borderRadius:5, backgroundColor:'gold', marginRight:10}}/>
-                  <Text style={{fontSize:15}}>{item.noticeNo}</Text>
-                </View>
-              </Animatable.View>
-              <Animatable.View animation='fadeInUp' delay={DURATION + 2 * 200} style={{marginBottom:5}}>
-                <Text style={styles.notiTitle}>공고기간</Text>
-                <View style={{flexDirection:'row', alignItems:'center'}}>
-                  <View style={{width:10, height:10, borderRadius:5, backgroundColor:'gold', marginRight:10}}/>
-                  <Text style={{fontSize:15}}>{`${dateFomat(item.noticeSdt.toString())} ~ ${dateFomat(item.noticeEdt.toString())}`}</Text>
-                </View>
-              </Animatable.View>
-              <Animatable.View animation='fadeInUp' delay={DURATION + 3 * 300} style={{marginBottom:5}}>
-                <Text style={styles.notiTitle}>발견장소</Text>
-                <View style={{flexDirection:'row', alignItems:'center'}}>
-                  <View style={{width:10, height:10, borderRadius:5, backgroundColor:'gold', marginRight:10}}/>
-                  <Text style={{fontSize:15}}>{item.happenPlace}</Text>
-                </View>
-              </Animatable.View>
-              <Animatable.View animation='fadeInUp' delay={DURATION + 4 * 400} style={{marginBottom:5}}>
-                <Text style={styles.notiTitle}>특이사항</Text>
-                <View style={{flexDirection:'row', alignItems:'center'}}>
-                  <View style={{width:10, height:10, borderRadius:5, backgroundColor:'gold', marginRight:10}}/>
-                  <Text style={{fontSize:14}}>{item.specialMark}</Text>
-                </View>
-              </Animatable.View>
-              <Animatable.View animation='fadeInUp' delay={DURATION + 5 * 500} style={{marginBottom:5}}>
-                <Text style={styles.notiTitle}>보호센터</Text>
-                <View style={{flexDirection:'row', alignItems:'center'}}>
-                  <View style={{width:10, height:10, borderRadius:5, backgroundColor:'gold', marginRight:10}}/>
-                  <Text style={{fontSize:14}}>{item.careNm} {`(Tel : ${item.careTel})`}</Text>
-                </View>
-              </Animatable.View>
+        <View style={[{
+          height: WINDOW_HEIGHT - (height + 130), top: height + 96.5
+        }, styles.descBg]} />
+        <View style={[{
+          height: WINDOW_HEIGHT - (height + 130), top: height + 96.5
+        }, styles.bg]}>
+          <Animatable.View style={{ justifyContent: 'center', marginTop: 0, marginBottom: 10 }} animation='fadeInLeft' delay={DURATION + 1 * 200} >
+            <Text style={{ fontSize: 20 }}>{item.kindCd}</Text>
+            <Text>{item.sexCd === 'M' ? '수컷' : '암컷'}/{item.colorCd}/{item.age}/{item.weight}</Text>
+          </Animatable.View>
+          <Animatable.View animation='fadeInUp' delay={DURATION + 1 * 200} style={{ marginBottom: 5 }}>
+            <Text style={styles.notiTitle}>공고번호</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: 'gold', marginRight: 10 }} />
+              <Text style={{ fontSize: 15 }}>{item.noticeNo}</Text>
             </View>
-        </SharedElement>
+          </Animatable.View>
+          <Animatable.View animation='fadeInUp' delay={DURATION + 2 * 200} style={{ marginBottom: 5 }}>
+            <Text style={styles.notiTitle}>공고기간</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: 'gold', marginRight: 10 }} />
+              <Text style={{ fontSize: 15 }}>{`${dateFomat(item.noticeSdt.toString())} ~ ${dateFomat(item.noticeEdt.toString())}`}</Text>
+            </View>
+          </Animatable.View>
+          <Animatable.View animation='fadeInUp' delay={DURATION + 3 * 200} style={{ marginBottom: 5 }}>
+            <Text style={styles.notiTitle}>발견장소</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: 'gold', marginRight: 10 }} />
+              <Text style={{ fontSize: 15 }}>{item.happenPlace}</Text>
+            </View>
+          </Animatable.View>
+          <Animatable.View animation='fadeInUp' delay={DURATION + 4 * 200} style={{ marginBottom: 5 }}>
+            <Text style={styles.notiTitle}>특이사항</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: 'gold', marginRight: 10 }} />
+              <Text style={{ fontSize: 14 }}>{item.specialMark}</Text>
+            </View>
+          </Animatable.View>
+          <Animatable.View animation='fadeInUp' delay={DURATION + 5 * 200} style={{ marginBottom: 5 }}>
+            <Text style={styles.notiTitle}>보호센터</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: 'gold', marginRight: 10 }} />
+              <Text style={{ fontSize: 14 }}>{item.careNm} {`(Tel : ${item.careTel})`}</Text>
+            </View>
+          </Animatable.View>
+        </View>
       </View >
-      <View style={{height:50, flexDirection:'row', paddingLeft:10, paddingRight:10}}>
-        <View style={{flex:1}}>
-          <TouchableScale activeScale={0.9} style={{flex:1, justifyContent:'center', alignItems:'center',backgroundColor: "#f4f6fc", borderWidth:1, borderColor:'#ECB04D'}}>
-            <Text style={{color:'#000'}}>공유</Text>
+      <View style={{ flexDirection: 'row', paddingLeft: 10, paddingRight: 10, height: WINDOW_HEIGHT - (WINDOW_HEIGHT - (50 + StatusBar.currentHeight)), backgroundColor: "#f4f6fc" }}>
+        <View style={{ flex: 1, height: 50 }}>
+          <TouchableScale activeScale={0.9} style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: "#f4f6fc", borderWidth: 1, borderColor: '#ECB04D', borderRadius: 5, marginRight: 10 }}>
+            <Text style={{ color: '#000' }}>공유</Text>
           </TouchableScale>
         </View>
-        <View style={{flex:1}}>
-          <TouchableScale activeScale={0.9} style={{flex:1, justifyContent:'center', alignItems:'center',backgroundColor: "#ECB04D", borderWidth:1, borderColor:'#ECB04D'}}
-          onPress={goAlert}>
-            <Text style={{color:'#fff'}}>문의</Text>
+        <View style={{ flex: 1, height: 50 }}>
+          <TouchableScale activeScale={0.9} style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: "#ECB04D", borderWidth: 1, borderColor: '#ECB04D', borderRadius: 5, marginLeft: 10 }}
+            onPress={goAlert}>
+            <Text style={{ color: '#fff' }}>문의</Text>
           </TouchableScale>
         </View>
       </View>
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     backgroundColor: '#fff',
-    paddingTop: StatusBar.currentHeight
+    paddingTop: StatusBar.currentHeight,
   },
   image: {
 
@@ -165,14 +165,22 @@ const styles = StyleSheet.create({
   bg: {
     position: 'absolute',
     width: '100%',
-    padding:20,
+    padding: 20,
+    paddingRight: 30,
     backgroundColor: '#f4f6fc',
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
   },
-  notiTitle : {
-    fontSize:16, 
-    fontWeight:'700', 
+  descBg: {
+    position: 'absolute',
+    width: '100%',
+    padding: 20,
+    backgroundColor: '#000',
+    opacity: 0.6
+  },
+  notiTitle: {
+    fontSize: 16,
+    fontWeight: '700',
 
   }
 });
