@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
-import { Text, View, SafeAreaView, StatusBar } from 'react-native'
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { View } from 'react-native'
 import Home from './Home';
 import Story from './Story';
 import { NavigationContainer } from '@react-navigation/native';
@@ -12,6 +11,9 @@ YellowBox.ignoreWarnings(['Remote debugger']);
 import { createSharedElementStackNavigator } from 'react-navigation-shared-element';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import Header from './Layout/Header';
+import { dateModalOpen } from '../Redux/Actions/Action';
+import { connect } from 'react-redux';
+import DateModal from './Modal/DateModal';
 
 const Stack = createSharedElementStackNavigator();
 const Tab = createMaterialTopTabNavigator();
@@ -28,7 +30,8 @@ function MyTabs() {
         </>
     );
 }
-export default class Main extends Component {
+
+class Main extends Component {
     render() {
         return (
             <>
@@ -69,8 +72,24 @@ export default class Main extends Component {
                             />
                         </Stack.Navigator>
                     </NavigationContainer>
+                    <DateModal open={this.props.store.dateModalSetting.dateOpen}/>
                 </View>
             </>
         )
     }
 }
+const mapStateToProps = (state) => {
+    return {
+      store: state
+    };
+}
+const mapDispatchToProps = (dispatch) => {
+// return bindActionCreators(actions, dispatch);
+    return {
+        dateModalOpen: (dateOpen) => {
+            return dispatch(dateModalOpen(dateOpen))
+        }
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Main);

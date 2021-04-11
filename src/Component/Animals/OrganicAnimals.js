@@ -1,51 +1,51 @@
 import axios from 'axios'
-import React, { Component } from 'react'
+import React, { Component, createRef } from 'react'
 import { Text, View, StyleSheet, Animated, Button, TouchableOpacity, ScrollView, FlatList, Dimensions, SafeAreaView, Image } from 'react-native'
 import { SERVICE_KEY, SERVICE_URL, WIDTH } from '../../Util/CommDef';
 import { isEmptyValid, prevMonthYear, dateToString, dateFomat } from '../../Util/Util';
 import { Picker } from '@react-native-community/picker';
 import Icon from 'react-native-vector-icons/FontAwesome5';
-import Date from '../Modal/DatePicker';
-import Modal from 'react-native-modal';
+import Reanimated from 'react-native-reanimated'
 import { SharedElement } from 'react-navigation-shared-element';
 import Header from '../Layout/Header';
 import AnimalList from './AnimalList';
-
+import { dateModalOpen } from '../../Redux/Actions/Action';
+import { connect } from 'react-redux';
+import BottomSheet from 'reanimated-bottom-sheet';
+import dog from '../../resource/images/happydog.png';
+import cat from '../../resource/images/happycat.png';
+import RBSheet from "react-native-raw-bottom-sheet";
 
 const WINDOW_WIDTH = Dimensions.get('window').width;
 const WINDOW_HEIGHT = Dimensions.get('window').height;
 
 
-export default class OrganicAnimals extends Component {
+class OrganicAnimals extends Component {
     constructor(props) {
         super(props)
         this.scrollY = new Animated.Value(0);
         var startDate = prevMonthYear(3);
         var endDate = prevMonthYear(0);
+        this.fall = new Animated.Value(1)
         this.state = {
             refreshing: false,
             page: 1,                                                                // 페이지                                                                                           
-            modal: false,                                                         // 모달창 열고 닫기
-            openName: '',                                                       // 모달 이름
+            openName: '',                                                           // 모달 이름
             expansionAnimate: new Animated.Value(40),
-            expansion: false,                                                   // 확장 버튼 열고 접기
-            offsetChk: false,                                                  // 검색창확인
-            sidoDataBody: [],                                                   // 시도 전체 정보
+            expansion: false,                                                       // 확장 버튼 열고 접기
+            offsetChk: false,                                                       // 검색창확인
+            sidoDataBody: [],                                                       // 시도 전체 정보
             sidoData: [],                                                           // 시도 정보
-            sido: '6110000',                                                     // 시도 값
-            sigunguDataBody: [],                                             // 시군구 전체 정보
-            sigunguData: [{ label: `모든지역`, value: 0 }],       // 시군구 정보
-            sigungu: '',                                                              // 시군구 값
+            sido: '6110000',                                                        // 시도 값
+            sigunguDataBody: [],                                                    // 시군구 전체 정보
+            sigunguData: [{ label: `모든지역`, value: 0 }],                         // 시군구 정보
+            sigungu: '',                                                            // 시군구 값
             upkind: 0,                                                              // 축종코드 - 개 : 417000 - 고양이 : 422400 - 기타 : 429900
-            kindDataBody: [],                                                   // 품종 전체 정보
-            kindData: [{ label: `전 체`, value: 0 }],                  // 품종 정보
-            kind: '',                                                                    // 품종 값
-            startDateInit: startDate,                                          // 시작 날짜
-            startDate: startDate,                                               // 시작 날짜
-            endDateInit: endDate,                                            // 종료 날짜
-            endDate: endDate,                                                 // 종료 날짜
-            animalData: [],                                                       // 검색 정보                 
-            detailData: {}                                                         // 상세정보
+            kindDataBody: [],                                                       // 품종 전체 정보
+            kindData: [{ label: `전 체`, value: 0 }],                               // 품종 정보
+            kind: '',                                                               // 품종 값
+            animalData: [],                                                         // 검색 정보                 
+            detailData: {}                                                          // 상세정보
         }
     }
 
@@ -143,8 +143,8 @@ export default class OrganicAnimals extends Component {
             kind,                                                                       // 품종
             sidoorgCd: this.state.sido,                                      // 시도 데이터 num default 전국 - 0
             sigunguorgCd: sigunguorgCd,                                 // 시군구 데이터 num default 모든지역 - 0
-            startDate: dateToString(this.state.startDate),         // 시작 날짜
-            endDate: dateToString(this.state.endDate)            // 종료 날짜
+            startDate: dateToString(this.props.store.dateModalSetting.startDate),         // 시작 날짜
+            endDate: dateToString(this.props.store.dateModalSetting.endDate)            // 종료 날짜
         };
 
         return param;
@@ -152,11 +152,12 @@ export default class OrganicAnimals extends Component {
 
     // 검색 터치 이벤트 
     searchOnPress = async () => {
-        await this.setState({
-            animalData: [],
-            page: 1
-        })
-        this._getAnimalData();
+        // await this.setState({
+        //     animalData: [],
+        //     page: 1
+        // })
+        this.RBSheet.open();
+        // this._getAnimalData();
     }
     // 유기동물 조회
     _getAnimalData = async () => {
@@ -187,10 +188,11 @@ export default class OrganicAnimals extends Component {
     }
     // 모달 이벤트
     modalEvent = openName => () => {
-        this.setState({
-            modal: !this.state.modal,
-            openName
-        })
+        if (openName === 'startDate') {
+            this.props.dateModalOpen(true, '0', '시작일 설정');
+        } else if (openName === 'endDate') {
+            this.props.dateModalOpen(true, '1', '종료일 설정');
+        }
     }
     // 데이터 변경 확인
     inputOnChange = async (state, value) => {
@@ -246,21 +248,7 @@ export default class OrganicAnimals extends Component {
             [state]: selectedDate
         })
     };
-    // 시작일 종료일 변경
-    onDateEvent = state => () => {
-        if (state === 'startDate') {
-            this.setState({
-                [state]: this.state.startDateInit,
-                modal: false
-            });
-        }
-        if (state === 'endDate') {
-            this.setState({
-                [state]: this.state.endDateInit,
-                modal: false
-            });
-        }
-    };
+
     _handleRefresh = () => {
         this.setState({
             animalData: [],
@@ -283,27 +271,78 @@ export default class OrganicAnimals extends Component {
         //     }).start();
         // }
     }
+    renderContent = () => {
+        return (
+            <View style={styles.panel}>
+                <View style={{flex:1}}>
+                    <Text>품종</Text>
+                    <View style={{flex:1, flexDirection:'row'}}>
+                        <View style={{flex:1,height:150, padding:10}}>
+                            <TouchableOpacity activeOpacity={1} style={{backgroundColor:'#fff', flex:1, borderRadius:10, justifyContent:'center', alignItems:'center', borderWidth:1, borderColor:'#fff' }}>
+                                <View style={{height:60,width:60,}}>
+                                    <Image source={dog} resizeMode={'contain'} style={{width:60, height:60}}/>
+                                </View>
+                                <Text>모든 동물</Text>
+                            </TouchableOpacity>
+                        </View>
+                        <View style={{flex:1,height:150, padding:10}}>
+                            <TouchableOpacity activeOpacity={1} style={{backgroundColor:'#fff', flex:1, borderRadius:10, justifyContent:'center', alignItems:'center', borderWidth:1, borderColor:'#fff' }}>
+                                <View style={{height:60,width:60,}}>
+                                    <Image source={dog} resizeMode={'contain'} style={{width:60, height:60}}/>
+                                </View>
+                                <Text>강아지</Text>
+                            </TouchableOpacity>
+                        </View>
+                        <View style={{flex:1,height:150, padding:10}}>
+                            <TouchableOpacity activeOpacity={1} style={{backgroundColor:'#fff', flex:1, borderRadius:10, justifyContent:'center', alignItems:'center', borderWidth:1, borderColor:'#fff' }}>
+                                <View style={{height:60,width:60,}}>
+                                    <Image source={cat} resizeMode={'contain'} style={{width:60, height:60}}/>
+                                </View>
+                                <Text>고양이</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+                <View style={{flex:1}}>
+                    <Text>지역</Text>
+                    <View style={{flex:1, height:100, flexDirection:'row'}}>
+                        <View style={{flex:1, backgroundColor:'blue'}}>
+                            <Image source={dog}/>
+                        </View>
+                        <View style={{flex:1, backgroundColor:'orange'}}>
 
-    // 모달 화면
-    modalRender = () => {
-        if (this.state.openName === 'startDate') {
-            return (
-                <Date date={this.state.startDate} title={'시작일 설정'} modal={this.modalEvent('startDate')} onDateChange={this.onDateChange('startDateInit')} onDateEvent={this.onDateEvent('startDate')} />
-            )
-        }
-        if (this.state.openName === 'endDate') {
-            return (
-                <Date date={this.state.endDate} title={'종료일 설정'} modal={this.modalEvent('endDate')} onDateChange={this.onDateChange('endDateInit')} onDateEvent={this.onDateEvent('endDate')} />
-            )
-        }
+                        </View>
+                        <View style={{flex:1, backgroundColor:'red'}}>
+
+                        </View>
+                    </View>
+                </View>
+            </View>
+          );
     }
-
-    render() {
+    renderHeader = () => (
+        <View style={styles.header}>
+          <View style={styles.panelHeader}>
+            <View style={styles.panelHandle} />
+          </View>
+        </View>
+      )
+      render() {
         return (
             <>
                 <Animated.View style={[styles.container]}>
-                    <Animated.View style={[{ flexDirection: 'row', overflow: "hidden", borderWidth: 1, borderBottomWidth: 0, marginLeft: 10, marginRight: 10, marginTop: 10 }, { height: this.state.expansionAnimate }]}>
+                    <Animated.View style={[{ flexDirection: 'row', overflow: "hidden", borderWidth: 1, marginLeft: 10, marginRight: 10, marginTop: 10 }, { height: this.state.expansionAnimate }]}>
                         <View style={{ height: 120, flex: 1 }}>
+                            <View style={{ flex: 1, flexDirection: 'row', borderBottomWidth: 1 }}>
+                                <View style={{ flex: 1, backgroundColor: '#fff' }}>
+                                    <Text>{this.state.upkind}</Text>
+                                </View>
+                                <View style={{ flex: 1, backgroundColor: '#fff' }}>
+                                    <Text>{this.state.sido}</Text>
+                                </View>
+                            </View>
+                        </View>
+                        {/* <View style={{ height: 120, flex: 1 }}>
                             <View style={{ flex: 1, flexDirection: 'row', borderBottomWidth: 1 }}>
                                 <View style={{ flex: 1, backgroundColor: '#fff' }}>
                                     <Picker
@@ -366,35 +405,39 @@ export default class OrganicAnimals extends Component {
                             <View style={{ flex: 1, flexDirection: 'row', backgroundColor: '#fff', alignItems: 'center' }}>
                                 <View style={{ flex: 1, alignItems: 'center' }}>
                                     <TouchableOpacity style={{ width: '100%', flex: 1, justifyContent: 'center', alignItems: 'center' }} activeOpacity={1} onPress={this.modalEvent('startDate')}>
-                                        <Text style={{ fontSize: 16 }}>{dateFomat(dateToString(this.state.startDate))}</Text>
+                                        <Text style={{ fontSize: 16 }}>{dateFomat(dateToString(this.props.store.dateModalSetting.startDate))}</Text>
                                     </TouchableOpacity>
                                 </View>
                                 <Text>~</Text>
                                 <View style={{ flex: 1, alignItems: 'center' }}>
                                     <TouchableOpacity style={{ width: '100%', flex: 1, justifyContent: 'center', alignItems: 'center' }} activeOpacity={1} onPress={this.modalEvent('endDate')}>
-                                        <Text style={{ fontSize: 16 }}>{dateFomat(dateToString(this.state.endDate))}</Text>
+                                        <Text style={{ fontSize: 16 }}>{dateFomat(dateToString(this.props.store.dateModalSetting.endDate))}</Text>
                                     </TouchableOpacity>
                                 </View>
                             </View>
-                        </View>
+                        </View> */}
                         <Animated.View style={{ width: 80, height: this.state.expansionAnimate }}>
                             <TouchableOpacity activeOpacity={1} style={{ flex: 1, width: 80, backgroundColor: '#ECB04D', alignItems: 'center', justifyContent: 'center', borderLeftWidth: 1 }} onPress={this.searchOnPress} >
                                 <Text style={{ color: '#fff' }}><Icon name='search' /> 검색</Text>
                             </TouchableOpacity>
                         </Animated.View>
                     </Animated.View>
-                    <TouchableOpacity activeOpacity={1} style={[styles.button, { marginBottom: 10, marginLeft: 10, marginRight: 10, backgroundColor: '#fff' }]} onPress={this.onExpansionPress}>
+                    {/* <TouchableOpacity activeOpacity={1} style={[styles.button, { marginBottom: 10, marginLeft: 10, marginRight: 10, backgroundColor: '#fff' }]} onPress={this.onExpansionPress}>
                         <Text>{this.state.expansion ? '접기' : '열기'}</Text>
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                     <AnimalList data={this.state.animalData} initData={this._handleLoadMore} refresh={this._handleRefresh} state={this.state} />
-                    {/* <SharedElement id={`generate.bg`}>
-                            <View style={styles.bg} />
-                        </SharedElement> */}
-                    <Modal isVisible={this.state.modal} useNativeDriver={true}
-                        hideModalContentWhileAnimating={true} deviceHeight={Dimensions.get('screen').height} deviceWidth={Dimensions.get('screen').width} customBackdrop={<View style={{ width: '100%', backgroundColor: 'red', height: 1400, padding: 0, margin: 0, position: 'absolute', top: 0, zIndex: 30 }} />}>
-                        {this.modalRender()}
-                    </Modal>
                 </Animated.View>
+                <RBSheet
+                    ref={ref => {
+                        this.RBSheet = ref;
+                    }}
+                    height={600}
+                    duration={250}
+                    closeOnDragDown={true}
+                    >
+                        
+                        {this.renderContent()}
+                </RBSheet>
             </>
         )
     }
@@ -405,6 +448,33 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#f4f6fc',
     },
+    header: {
+        backgroundColor: '#fff',
+        shadowColor: '#000000',
+        paddingTop: 20,
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+      },
+      panelHeader: {
+        alignItems: 'center',
+      },
+      panelHandle: {
+        width: 40,
+        height: 8,
+        borderRadius: 4,
+        backgroundColor: '#000000',
+        marginBottom: 10,
+      },
+      panel: {
+        height: 600,
+        padding: 20,
+        backgroundColor: '#fff',
+        paddingTop: 20,
+        shadowColor: '#000000',
+        shadowOffset: { width: 0, height: 0 },
+        shadowRadius: 5,
+        shadowOpacity: 0.4,
+      },
     selectStyle: {
         flex: 1,
         fontSize: 12,
@@ -431,3 +501,19 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 16,
     },
 })
+
+const mapStateToProps = (state) => {
+    return {
+      store: state
+    };
+}
+const mapDispatchToProps = (dispatch) => {
+// return bindActionCreators(actions, dispatch);
+    return {
+        dateModalOpen: (dateOpen, dateType, title) => {
+            return dispatch(dateModalOpen(dateOpen, dateType, title))
+        }
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(OrganicAnimals);

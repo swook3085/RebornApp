@@ -6,7 +6,7 @@ import Animated from 'react-native-reanimated';
 
 export function TabBar({ state, descriptors, navigation, position }) {
   const [translateValue] = useState(new Animated.Value(0));
-  const totalWidth = Dimensions.get("window").width - 20;
+  const totalWidth = Dimensions.get("window").width;
   const tabWidth = totalWidth / state.routes.length;
   var inputRange, late;
   state.routes.map((route, index) => {
@@ -17,17 +17,10 @@ export function TabBar({ state, descriptors, navigation, position }) {
     });
   })
   return (
+    <>
     <View style={{
       display: 'flex',
-      flexDirection: 'row', backgroundColor: "#ECB04D", height: 60, borderRadius: 15, margin: 10, marginBottom: StatusBar.currentHeight, justifyContent: "center", alignItems: "center", shadowColor: "#000",
-      shadowOffset: {
-        width: 0,
-        height: 2,
-      },
-      shadowOpacity: 0.25,
-      shadowRadius: 3.84,
-      elevation: 5,
-    }}>
+      flexDirection: 'row', backgroundColor: "#ECB04D", height: 60, borderTopLeftRadius: 15,borderTopRightRadius:15,  justifyContent: "center", alignItems: "center"}}>
       <Animated.View style={{
         height: 40,
         position: "absolute",
@@ -89,5 +82,7 @@ export function TabBar({ state, descriptors, navigation, position }) {
         );
       })}
     </View>
+    <View style={{backgroundColor: "#ECB04D", height:StatusBar.currentHeight}}/>
+    </>
   );
 }
