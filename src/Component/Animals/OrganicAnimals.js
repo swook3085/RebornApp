@@ -1,6 +1,6 @@
 import axios from 'axios'
 import React, { Component, createRef } from 'react'
-import { Text, View, StyleSheet, Animated, Button, TouchableOpacity, ScrollView, FlatList, Dimensions, SafeAreaView, Image } from 'react-native'
+import { Text, View, StyleSheet, Animated, Button, TouchableOpacity, ScrollView, FlatList, Dimensions, SafeAreaView, Image, StatusBar } from 'react-native'
 import { SERVICE_KEY, SERVICE_URL, WIDTH } from '../../Util/CommDef';
 import { isEmptyValid, prevMonthYear, dateToString, dateFomat } from '../../Util/Util';
 import { Picker } from '@react-native-community/picker';
@@ -11,10 +11,10 @@ import Header from '../Layout/Header';
 import AnimalList from './AnimalList';
 import { dateModalOpen } from '../../Redux/Actions/Action';
 import { connect } from 'react-redux';
-import BottomSheet from 'reanimated-bottom-sheet';
 import dog from '../../resource/images/happydog.png';
 import cat from '../../resource/images/happycat.png';
 import RBSheet from "react-native-raw-bottom-sheet";
+import DatePicker from 'react-native-date-picker';
 
 const WINDOW_WIDTH = Dimensions.get('window').width;
 const WINDOW_HEIGHT = Dimensions.get('window').height;
@@ -44,6 +44,10 @@ class OrganicAnimals extends Component {
             kindDataBody: [],                                                       // 품종 전체 정보
             kindData: [{ label: `전 체`, value: 0 }],                               // 품종 정보
             kind: '',                                                               // 품종 값
+            startDateInit: startDate,                                               // 시작 날짜
+            startDate: startDate,                                                   // 시작 날짜
+            endDateInit: endDate,                                                   // 종료 날짜
+            endDate: endDate,                                                       // 종료 날짜
             animalData: [],                                                         // 검색 정보                 
             detailData: {}                                                          // 상세정보
         }
@@ -51,6 +55,7 @@ class OrganicAnimals extends Component {
 
     async componentDidMount() {
         await this.getSidoInfoApi();
+        await this.getSigunguInfoApi(this.state.sido);
         await this._getAnimalData();
     }
     // 품종 정보 가져오기
@@ -139,12 +144,12 @@ class OrganicAnimals extends Component {
         };
         var param = {
             page: this.state.page,
-            upkind,                                                                   // 축종
-            kind,                                                                       // 품종
-            sidoorgCd: this.state.sido,                                      // 시도 데이터 num default 전국 - 0
-            sigunguorgCd: sigunguorgCd,                                 // 시군구 데이터 num default 모든지역 - 0
-            startDate: dateToString(this.props.store.dateModalSetting.startDate),         // 시작 날짜
-            endDate: dateToString(this.props.store.dateModalSetting.endDate)            // 종료 날짜
+            upkind,                                                         // 축종
+            kind,                                                           // 품종
+            sidoorgCd: this.state.sido,                                     // 시도 데이터 num default 전국 - 0
+            sigunguorgCd: sigunguorgCd,                                     // 시군구 데이터 num default 모든지역 - 0
+            startDate: dateToString(this.state.startDate),                  // 시작 날짜
+            endDate: dateToString(this.state.endDate)                       // 종료 날짜
         };
 
         return param;
@@ -158,6 +163,13 @@ class OrganicAnimals extends Component {
         // })
         this.RBSheet.open();
         // this._getAnimalData();
+    }
+    searchOnPressTest = async () => {
+        await this.setState({
+            animalData: [],
+            page: 1
+        })
+        this._getAnimalData();
     }
     // 유기동물 조회
     _getAnimalData = async () => {
@@ -180,6 +192,7 @@ class OrganicAnimals extends Component {
                 })
             }
         });
+        this.RBSheet.close();
     }
 
     // 무한 스크롤 이벤트
@@ -248,7 +261,21 @@ class OrganicAnimals extends Component {
             [state]: selectedDate
         })
     };
-
+    // 시작일 종료일 변경
+    onDateEvent = state => () => {
+        if (state === 'startDate') {
+            this.setState({
+                [state]: this.state.startDateInit,
+            });
+            this.RBSheetStartDate.close();
+        }
+        if (state === 'endDate') {
+            this.setState({
+                [state]: this.state.endDateInit,
+            });
+            this.RBSheetEndDate.close();
+        }
+    };
     _handleRefresh = () => {
         this.setState({
             animalData: [],
@@ -273,12 +300,13 @@ class OrganicAnimals extends Component {
     }
     renderContent = () => {
         return (
+            <>
             <View style={styles.panel}>
-                <View style={{flex:1}}>
-                    <Text>품종</Text>
+                <View style={{height:200, paddingHorizontal:20 }}>
+                    <Text style={{textAlign:'center', paddingVertical:10, fontSize:16}}>품종</Text>
                     <View style={{flex:1, flexDirection:'row'}}>
                         <View style={{flex:1,height:150, padding:10}}>
-                            <TouchableOpacity activeOpacity={1} style={{backgroundColor:'#fff', flex:1, borderRadius:10, justifyContent:'center', alignItems:'center', borderWidth:1, borderColor:'#fff' }}>
+                            <TouchableOpacity activeOpacity={1} style={[styles.card, this.state.upkind == 0 && styles.active]} onPress={() => this.inputOnChange('upkind', '0')}>
                                 <View style={{height:60,width:60,}}>
                                     <Image source={dog} resizeMode={'contain'} style={{width:60, height:60}}/>
                                 </View>
@@ -286,7 +314,7 @@ class OrganicAnimals extends Component {
                             </TouchableOpacity>
                         </View>
                         <View style={{flex:1,height:150, padding:10}}>
-                            <TouchableOpacity activeOpacity={1} style={{backgroundColor:'#fff', flex:1, borderRadius:10, justifyContent:'center', alignItems:'center', borderWidth:1, borderColor:'#fff' }}>
+                            <TouchableOpacity activeOpacity={1} style={[styles.card, this.state.upkind == 417000 && styles.active]} onPress={() => this.inputOnChange('upkind', '417000')}>
                                 <View style={{height:60,width:60,}}>
                                     <Image source={dog} resizeMode={'contain'} style={{width:60, height:60}}/>
                                 </View>
@@ -294,7 +322,7 @@ class OrganicAnimals extends Component {
                             </TouchableOpacity>
                         </View>
                         <View style={{flex:1,height:150, padding:10}}>
-                            <TouchableOpacity activeOpacity={1} style={{backgroundColor:'#fff', flex:1, borderRadius:10, justifyContent:'center', alignItems:'center', borderWidth:1, borderColor:'#fff' }}>
+                            <TouchableOpacity activeOpacity={1} style={[styles.card, this.state.upkind == 422400 && styles.active]} onPress={() => this.inputOnChange('upkind', '422400')}>
                                 <View style={{height:60,width:60,}}>
                                     <Image source={cat} resizeMode={'contain'} style={{width:60, height:60}}/>
                                 </View>
@@ -303,30 +331,101 @@ class OrganicAnimals extends Component {
                         </View>
                     </View>
                 </View>
-                <View style={{flex:1}}>
-                    <Text>지역</Text>
-                    <View style={{flex:1, height:100, flexDirection:'row'}}>
-                        <View style={{flex:1, backgroundColor:'blue'}}>
-                            <Image source={dog}/>
+                <View style={{height:190, paddingHorizontal:20}}>
+                    <Text style={{textAlign:'center', paddingVertical:10, fontSize:16}}>지역</Text>
+                    <View style={{height:70, marginTop:10, }}>
+                        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+                            {this.state.sidoData.map((data, index) => {
+                                return (
+                                    <TouchableOpacity key={index} activeOpacity={1} style={[styles.card,{padding:10, marginRight:10, height:50}, this.state.sido == data.value && styles.sidoActive]} onPress={() => this.inputOnChange('sido', data.value)}>
+                                        <Text style={this.state.sido == data.value && styles.sidoTextActive}>{data.label}</Text>
+                                    </TouchableOpacity>
+                                )
+                            })}
+                        </ScrollView>
+                    </View>
+                    <View style={{height:70}}>
+                        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+                            {this.state.sigunguData.map((data, index) => {
+                                return (
+                                    <TouchableOpacity key={index} activeOpacity={1} style={[styles.card,{padding:10, marginRight:10, height:50}, this.state.sigungu == data.value && styles.sidoActive]} onPress={() => this.inputOnChange('sigungu', data.value)}>
+                                        <Text style={this.state.sigungu == data.value && styles.sidoTextActive}>{data.label}</Text>
+                                    </TouchableOpacity>
+                                )
+                            })}
+                        </ScrollView>
+                    </View>
+                </View>
+                <View style={{height:100, paddingHorizontal:20, marginBottom:20}}>
+                    <Text style={{textAlign:'center', paddingVertical:10, fontSize:16}}>기간</Text>
+                    <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center',}}>
+                        <View style={{ flex: 1}}>
+                            <TouchableOpacity style={[styles.card,{ width: '90%', flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor:'#fff'  }]} activeOpacity={1} onPress={() => this.RBSheetStartDate.open()}>
+                                <Text style={{ fontSize: 16 }}>{dateFomat(dateToString(this.state.startDate))}</Text>
+                            </TouchableOpacity>
                         </View>
-                        <View style={{flex:1, backgroundColor:'orange'}}>
-
-                        </View>
-                        <View style={{flex:1, backgroundColor:'red'}}>
-
+                        <Text>~</Text>
+                        <View style={{ flex: 1, alignItems: 'flex-end' }}>
+                            <TouchableOpacity style={[styles.card,{ width: '90%', flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor:'#fff'  }]} activeOpacity={1} onPress={() => this.RBSheetEndDate.open()}>
+                                <Text style={{ fontSize: 16 }}>{dateFomat(dateToString(this.state.endDate))}</Text>
+                            </TouchableOpacity>
                         </View>
                     </View>
                 </View>
+                <TouchableOpacity style={{backgroundColor: '#ECB04D', alignItems: 'center', flex:1, justifyContent:'center',paddingBottom:StatusBar.currentHeight}} activeOpacity={1} onPress={this.searchOnPressTest}>
+                    <Text style={{ color:'#fff', fontSize:18}}><Icon name='search' size={16} /> 검색</Text>
+                </TouchableOpacity>
+                {/* <TouchableOpacity style={{ backgroundColor: '#ECB04D', alignItems: 'center', flex:1}} activeOpacity={1}>
+                </TouchableOpacity> */}
             </View>
+            <RBSheet ref={ref => {this.RBSheetStartDate = ref}} animationType="fade" height={330} duration={250}
+                customStyles={{container: {
+                    borderTopRightRadius:10,
+                    borderTopLeftRadius:10,
+                    backgroundColor:'#fff',
+                    alignItems:'center',
+                    }}}
+                >
+                <View style={styles.title}>
+                    <Text style={styles.titleText}>시작일 설정</Text>
+                </View>
+                <DatePicker
+                    style={{height:180, marginVertical:20}}
+                    date={this.state.startDateInit}
+                    onDateChange={this.onDateChange('startDateInit')}
+                    mode="date" />
+                <TouchableOpacity style={{ width: '100%', backgroundColor: '#ECB04D', alignItems: 'center', flex:1, justifyContent: 'center' }} activeOpacity={1} onPress={this.onDateEvent('startDate')}>
+                    <Text style={styles.doneText}>
+                        설정
+                    </Text>
+                </TouchableOpacity>
+            </RBSheet>
+            <RBSheet ref={ref => {this.RBSheetEndDate = ref}} animationType="fade" height={330} duration={250}
+                customStyles={{container: {
+                    borderTopRightRadius:10,
+                    borderTopLeftRadius:10,
+                    backgroundColor:'#fff',
+                    alignItems:'center',
+                    }}}
+                >
+                <View style={styles.title}>
+                    <Text style={styles.titleText}>종료일 설정</Text>
+                </View>
+                <DatePicker
+                    style={{height:180, marginVertical:20}}
+                    date={this.state.endDateInit}
+                    onDateChange={this.onDateChange('endDateInit')}
+                    mode="date" />
+                <TouchableOpacity style={{ width: '100%', backgroundColor: '#ECB04D', alignItems: 'center', flex:1, justifyContent: 'center' }} activeOpacity={1} onPress={this.onDateEvent('endDate')}>
+                    <Text style={styles.doneText}>
+                        설정
+                    </Text>
+                </TouchableOpacity>
+            </RBSheet>
+            </>
           );
     }
-    renderHeader = () => (
-        <View style={styles.header}>
-          <View style={styles.panelHeader}>
-            <View style={styles.panelHandle} />
-          </View>
-        </View>
-      )
+
       render() {
         return (
             <>
@@ -431,8 +530,15 @@ class OrganicAnimals extends Component {
                     ref={ref => {
                         this.RBSheet = ref;
                     }}
+                    animationType="fade"
                     height={600}
                     duration={250}
+                    dragFromTopOnly={true}
+                    customStyles={{container: {
+                        borderTopRightRadius:10,
+                        borderTopLeftRadius:10,
+                        backgroundColor:'#f4f6fc'
+                      }}}
                     closeOnDragDown={true}
                     >
                         
@@ -467,9 +573,8 @@ const styles = StyleSheet.create({
       },
       panel: {
         height: 600,
-        padding: 20,
-        backgroundColor: '#fff',
-        paddingTop: 20,
+        backgroundColor: '#f4f6fc',
+        paddingTop: 0,
         shadowColor: '#000000',
         shadowOffset: { width: 0, height: 0 },
         shadowRadius: 5,
@@ -478,14 +583,6 @@ const styles = StyleSheet.create({
     selectStyle: {
         flex: 1,
         fontSize: 12,
-    },
-    card: {
-        borderWidth: 1,
-        width: 200,
-        borderColor: "rgba(155,155,155,1)",
-        borderBottomLeftRadius: 10,
-        marginTop: 10,
-        marginLeft: 4
     },
     button: {
         alignItems: 'center',
@@ -500,6 +597,51 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 16,
         borderTopRightRadius: 16,
     },
+    card : {
+        backgroundColor:'#fff', 
+        flex:1, 
+        borderRadius:10, 
+        justifyContent:'center',
+        alignItems:'center', 
+        borderWidth:1,
+        borderColor:'#fff',
+        shadowColor: '#000', 
+        shadowOffset: { width: 0, height: 10 }, 
+        shadowOpacity: .3, 
+        shadowRadius: 20, 
+        elevation: 5, 
+    },
+    active : {
+        borderColor: '#ECB04D',
+        backgroundColor:'#fff',
+        shadowColor: '#000', 
+        shadowOffset: { width: 0, height: 10 }, 
+        shadowOpacity: .3, 
+        shadowRadius: 20, 
+        elevation: 5,
+    },
+    sidoActive : {
+        borderColor: '#ECB04D',
+        backgroundColor:'#ECB04D',
+    },
+    sidoTextActive : {
+        color:'#fff'
+    },
+    title: {
+        width: '100%',
+        borderBottomWidth: 1,
+        borderBottomColor: '#c8ced3',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height:50
+    },
+    doneText: {
+        color: '#fff',
+        fontSize: 16,
+    },
+    titleText: {
+        fontSize: 18,
+    }
 })
 
 const mapStateToProps = (state) => {

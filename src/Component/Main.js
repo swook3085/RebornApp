@@ -13,7 +13,6 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 import Header from './Layout/Header';
 import { dateModalOpen } from '../Redux/Actions/Action';
 import { connect } from 'react-redux';
-import DateModal from './Modal/DateModal';
 
 const Stack = createSharedElementStackNavigator();
 const Tab = createMaterialTopTabNavigator();
@@ -72,7 +71,6 @@ class Main extends Component {
                             />
                         </Stack.Navigator>
                     </NavigationContainer>
-                    <DateModal open={this.props.store.dateModalSetting.dateOpen}/>
                 </View>
             </>
         )
