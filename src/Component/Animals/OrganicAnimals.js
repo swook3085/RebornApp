@@ -5,6 +5,7 @@ import { SERVICE_KEY, SERVICE_URL, WIDTH } from '../../Util/CommDef';
 import { isEmptyValid, prevMonthYear, dateToString, dateFomat } from '../../Util/Util';
 import { Picker } from '@react-native-community/picker';
 import Icon from 'react-native-vector-icons/FontAwesome5';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import { SharedElement } from 'react-navigation-shared-element';
 import AnimalList from './AnimalList';
 import { dateModalOpen } from '../../Redux/Actions/Action';
@@ -14,6 +15,7 @@ import cat from '../../resource/images/happycat.png';
 import RBSheet from "react-native-raw-bottom-sheet";
 import DatePicker from 'react-native-date-picker';
 import * as Animatable from 'react-native-animatable'
+import { convertUpkind, convertSido } from '../../Util/Convert';
 
 const WINDOW_WIDTH = Dimensions.get('window').width;
 const WINDOW_HEIGHT = Dimensions.get('window').height;
@@ -39,16 +41,16 @@ class OrganicAnimals extends Component {
             sigunguDataBody: [],                                                  // 시군구 전체 정보
             sigunguData: [{ label: `모든지역`, value: 0 }],            // 시군구 정보
             sigungu: '',                                                                  // 시군구 값
-            upkind: 0,                                                              // 축종코드 - 개 : 417000 - 고양이 : 422400 - 기타 : 429900
+            upkind: '0',                                                                  // 축종코드 - 개 : 417000 - 고양이 : 422400 - 기타 : 429900
             kindDataBody: [],                                                       // 품종 전체 정보
-            kindData: [{ label: `전 체`, value: 0 }],                               // 품종 정보
-            kind: '',                                                               // 품종 값
-            startDateInit: startDate,                                               // 시작 날짜
+            kindData: [{ label: `전 체`, value: 0 }],                       // 품종 정보
+            kind: '',                                                                       // 품종 값
+            startDateInit: startDate,                                             // 시작 날짜
             startDate: startDate,                                                   // 시작 날짜
-            endDateInit: endDate,                                                   // 종료 날짜
-            endDate: endDate,                                                       // 종료 날짜
-            animalData: [],                                                         // 검색 정보                 
-            detailData: {}                                                          // 상세정보
+            endDateInit: endDate,                                                // 종료 날짜
+            endDate: endDate,                                                     // 종료 날짜
+            animalData: [],                                                            // 검색 정보                 
+            detailData: {}                                                              // 상세정보
         }
     }
 
@@ -174,7 +176,7 @@ class OrganicAnimals extends Component {
     _getAnimalData = async () => {
         var data = await this.animalValid();
         console.log(data)
-        await axios.get(`${SERVICE_URL}abandonmentPublic?upkind=${data.upkind}&kind=${data.kind}&upr_cd=${data.sidoorgCd}&org_cd=${data.sigunguorgCd}&bgnde=${data.startDate}&endde=${data.endDate}&pageNo=${data.page}&numOfRows=20&serviceKey=${SERVICE_KEY}`).then((res) => {
+        await axios.get(`${SERVICE_URL}abandonmentPublic?upkind=${data.upkind}&kind=${data.kind}&upr_cd=${data.sidoorgCd}&org_cd=${data.sigunguorgCd}&bgnde=${data.startDate}&endde=${data.endDate}&state=notice&pageNo=${data.page}&numOfRows=20&serviceKey=${SERVICE_KEY}`).then((res) => {
             console.log(res.data.response.body);
             if (res.status === 200 && !isEmptyValid(res.data.response.body) && !isEmptyValid(res.data.response.body.items) && !isEmptyValid(res.data.response.body.items.item)) {
                 this.setState({
@@ -212,12 +214,12 @@ class OrganicAnimals extends Component {
             [state]: value
         });
 
-        if (state === 'upkind') {
-            this.getKindInfoApi(this.state.upkind);
-        }
-        if (state === 'sido') {
-            this.getSigunguInfoApi(this.state.sido);
-        }
+        // if (state === 'upkind') {
+        //     this.getKindInfoApi(this.state.upkind);
+        // }
+        // if (state === 'sido') {
+        //     this.getSigunguInfoApi(this.state.sido);
+        // }
     }
     // 확장 이벤트 
     onExpansionPress = () => {
@@ -328,7 +330,7 @@ class OrganicAnimals extends Component {
                             </Animatable.View>
                         </View>
                     </View>
-                    <View style={{ height: 190, paddingHorizontal: 20 }}>
+                    <View style={{ height: 120, paddingHorizontal: 20 }}>
                         <Animatable.Text style={{ textAlign: 'center', paddingVertical: 10, fontSize: 16 }} animation='zoomIn' delay={200}>지역</Animatable.Text>
                         <View style={{ height: 70, marginTop: 10, }}>
                             <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
@@ -343,7 +345,7 @@ class OrganicAnimals extends Component {
                                 })}
                             </ScrollView>
                         </View>
-                        <View style={{ height: 70 }}>
+                        {/* <View style={{ height: 70 }}>
                             <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
                                 {this.state.sigunguData.map((data, index) => {
                                     return (
@@ -355,7 +357,7 @@ class OrganicAnimals extends Component {
                                     )
                                 })}
                             </ScrollView>
-                        </View>
+                        </View> */}
                     </View>
                     <View style={{ height: 100, paddingHorizontal: 20, marginBottom: 20 }}>
                         <Animatable.Text style={{ textAlign: 'center', paddingVertical: 10, fontSize: 16 }} animation='zoomIn' delay={200}>기간</Animatable.Text>
@@ -379,7 +381,7 @@ class OrganicAnimals extends Component {
                     {/* <TouchableOpacity style={{ backgroundColor: '#ECB04D', alignItems: 'center', flex:1}} activeOpacity={1}>
                 </TouchableOpacity> */}
                 </View>
-                <RBSheet ref={ref => { this.RBSheetStartDate = ref }} animationType="fade" height={330} duration={250}
+                <RBSheet ref={ref => { this.RBSheetStartDate = ref }} height={330} duration={250}
                     customStyles={{
                         container: {
                             borderTopRightRadius: 10,
@@ -403,7 +405,7 @@ class OrganicAnimals extends Component {
                         </Text>
                     </TouchableOpacity>
                 </RBSheet>
-                <RBSheet ref={ref => { this.RBSheetEndDate = ref }} animationType="fade" height={330} duration={250}
+                <RBSheet ref={ref => { this.RBSheetEndDate = ref }} height={330} duration={250}
                     customStyles={{
                         container: {
                             borderTopRightRadius: 10,
@@ -435,34 +437,30 @@ class OrganicAnimals extends Component {
         return (
             <>
                 <Animated.View style={[styles.container]}>
-                    <Animated.View style={[{ flexDirection: 'row', overflow: "hidden", borderWidth: 1, marginLeft: 10, marginRight: 10, marginTop: 10 }, { height: this.state.expansionAnimate }]}>
-                        <View style={{ height: 120, flex: 1 }}>
-                            <View style={{ flex: 1, flexDirection: 'row', borderBottomWidth: 1 }}>
-                                <View style={{ flex: 1, backgroundColor: '#fff' }}>
-                                    <Text>{this.state.upkind}</Text>
-                                </View>
-                                <View style={{ flex: 1, backgroundColor: '#fff' }}>
-                                    <Text>{this.state.sido}</Text>
+                <View style={{ height: StatusBar.currentHeight+20 }} />
+                    <Animated.View style={[{ flexDirection: 'row', overflow: "hidden",marginLeft: 10, marginRight: 10, marginTop: 10, borderRadius:5 }, { height: this.state.expansionAnimate }]}>
+                        <View style={{ height: 40, flex: 1 }}>
+                            <View style={{ display:'flex',flex: 1, flexDirection: 'row', backgroundColor: '#fff',paddingLeft:10}}>
+                                <View style={{ justifyContent: 'center', alignItems:'center', display:'flex', flexDirection:'row' }}>
+                                    <Text style={{backgroundColor: '#ECB04D', padding:5, paddingHorizontal:10, borderRadius:5, color:'#fff', height:30}}>{convertUpkind(this.state.upkind)}</Text>
+                                    <Text style={{backgroundColor: '#ECB04D', padding:5, paddingHorizontal:10, borderRadius:5, color:'#fff', height:30, marginLeft:10}}>{convertSido(this.state.sido.toString())}</Text>
                                 </View>
                             </View>
                         </View>
                         <Animated.View style={{ width: 80, height: this.state.expansionAnimate }}>
-                            <TouchableOpacity activeOpacity={1} style={{ flex: 1, width: 80, backgroundColor: '#ECB04D', alignItems: 'center', justifyContent: 'center', borderLeftWidth: 1 }} onPress={this.searchOnPress} >
+                            <TouchableOpacity activeOpacity={1} style={{ flex: 1, width: 80, height:40, backgroundColor: '#ECB04D', alignItems: 'center', justifyContent: 'center', }} onPress={this.searchOnPress} >
                                 <Text style={{ color: '#fff' }}><Icon name='search' /> 검색</Text>
                             </TouchableOpacity>
                         </Animated.View>
                     </Animated.View>
-                    {/* <TouchableOpacity activeOpacity={1} style={[styles.button, { marginBottom: 10, marginLeft: 10, marginRight: 10, backgroundColor: '#fff' }]} onPress={this.onExpansionPress}>
-                        <Text>{this.state.expansion ? '접기' : '열기'}</Text>
-                    </TouchableOpacity> */}
                     <AnimalList data={this.state.animalData} initData={this._handleLoadMore} refresh={this._handleRefresh} state={this.state} />
                 </Animated.View>
                 <RBSheet
                     ref={ref => {
                         this.RBSheet = ref;
                     }}
-                    animationType="fade"
-                    height={600}
+                    // animationType="fade"
+                    height={530}
                     duration={250}
                     dragFromTopOnly={true}
                     customStyles={{
@@ -505,7 +503,7 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     panel: {
-        height: 600,
+        height: 530,
         backgroundColor: '#f4f6fc',
         paddingTop: 0,
         shadowColor: '#000000',

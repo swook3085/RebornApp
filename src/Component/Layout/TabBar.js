@@ -3,15 +3,17 @@ import { Text, View, TouchableOpacity, StatusBar, Dimensions } from 'react-nativ
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Animated from 'react-native-reanimated';
+import RebornContext from '../Context';
 
-export function TabBar({ state, descriptors, navigation, position }) {
+export const TabBar = (props) => {
+  const { screen, setScreen } = React.useContext(RebornContext)
   const [translateValue] = useState(new Animated.Value(0));
   const totalWidth = Dimensions.get("window").width;
-  const tabWidth = totalWidth / state.routes.length;
+  const tabWidth = totalWidth / props.state.routes.length;
   var inputRange, late;
-  state.routes.map((route, index) => {
-    inputRange = state.routes.map((_, i) => i);
-    late = Animated.interpolate(position, {
+  props.state.routes.map((route, index) => {
+    inputRange = props.state.routes.map((_, i) => i);
+    late = Animated.interpolate(props.position, {
       inputRange,
       outputRange: inputRange.map(i => (i === index ? i * tabWidth : i * tabWidth)),
     });
@@ -19,8 +21,7 @@ export function TabBar({ state, descriptors, navigation, position }) {
   return (
     <>
     <View style={{
-      display: 'flex',
-      flexDirection: 'row', backgroundColor: "#ECB04D", height: 60, borderTopLeftRadius: 15,borderTopRightRadius:15,  justifyContent: "center", alignItems: "center"}}>
+      flexDirection: 'row', backgroundColor: "#ECB04D", height: 60, borderTopLeftRadius: 15,borderTopRightRadius:15,  justifyContent: "center", alignItems: "center", display:screen > 0 ? 'none' : 'flex'}}>
       <Animated.View style={{
         height: 40,
         position: "absolute",
@@ -32,18 +33,19 @@ export function TabBar({ state, descriptors, navigation, position }) {
         transform: [{ translateX: late }],
         width: tabWidth - 40,
       }} />
-      {state.routes.map((route, index) => {
-        const { options } = descriptors[route.key];
+      {props.state.routes.map((route, index) => {
+        const { options } = props.descriptors[route.key];
+        options.tabBarVisible = false;
         const label =
           options.tabBarLabel !== undefined
             ? options.tabBarLabel
             : options.title !== undefined
               ? options.title
               : route.name;
-        const isFocused = state.index === index;
+        const isFocused = props.state.index === index;
 
         const onPress = () => {
-          const event = navigation.emit({
+          const event = props.navigation.emit({
             type: 'tabPress',
             target: route.key,
           });
@@ -53,12 +55,12 @@ export function TabBar({ state, descriptors, navigation, position }) {
             useNativeDriver: true,
           }).start();
           if (!isFocused && !event.defaultPrevented) {
-            navigation.navigate(route.name);
+            props.navigation.navigate(route.name);
           }
         };
 
         const onLongPress = () => {
-          navigation.emit({
+          props.navigation.emit({
             type: 'tabLongPress',
             target: route.key,
           });
@@ -78,11 +80,12 @@ export function TabBar({ state, descriptors, navigation, position }) {
             {label === 'home' && <Icon name="home" color={isFocused ? '#ECB04D' : '#fff'} size={25} />}
             {label === 'Search' && <Icon name="search" color={isFocused ? '#ECB04D' : '#fff'} size={25} />}
             {label === 'story' && <MaterialIcons name="article" color={isFocused ? '#ECB04D' : '#fff'} size={25} />}
+            {label === 'account' && <Icon name="user" color={isFocused ? '#ECB04D' : '#fff'} size={25} />}
           </TouchableOpacity>
         );
       })}
     </View>
-    <View style={{backgroundColor: "#ECB04D", height:StatusBar.currentHeight}}/>
+    <View style={{backgroundColor: "#ECB04D", height:StatusBar.currentHeight, display:screen > 0 ? 'none' : 'flex'}}/>
     </>
   );
 }
