@@ -48,9 +48,9 @@ export default function AnimalList(props) {
                 return (
                     <TouchableOpacity activeOpacity={1} onPress={() => navigation.navigate('Details', { item, index })} style={{ height: 130, marginBottom: 10 }}>
                         <Animated.View style={{ flex: 1, backgroundColor: '#fff', borderRadius: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 10 }, transform: [{ scale }], opacity }}>
-                            <SharedElement id={`item.${index}.image`} style={[{ height: '100%', width: 140, borderBottomLeftRadius: 16, borderTopLeftRadius: 16, position: 'absolute', left: 0 }]} collapsable={false}>
+                            {/* <SharedElement id={`item.${index}.image`} style={[{ height: '100%', width: 140, borderBottomLeftRadius: 16, borderTopLeftRadius: 16, position: 'absolute', left: 0 }]} collapsable={false}> */}
                                 <Image source={{ uri: item.popfile }} resizeMode='cover' style={[{ height: '100%', width: 140, borderBottomLeftRadius: 16, borderTopLeftRadius: 16 }]} />
-                            </SharedElement>
+                            {/* </SharedElement> */}
                             {/* <SharedElement id={`item.${index}.statebg`} style={{ borderBottomLeftRadius: 16, position: 'absolute', left: 0, bottom: 0 }}>
                                 <View style={{ width: 140, height: 30, backgroundColor: '#000', opacity: 0.5, borderBottomLeftRadius: 16 }} />
                             </SharedElement> */}

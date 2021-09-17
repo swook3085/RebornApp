@@ -35,7 +35,7 @@ const TopNavigation = props => {
       />
       <View style={styles.container(safeArea, isFloating, isTransparent)}>
         <TouchableOpacity activeOpacity={1} onPress={() => navigation.goBack()} style={[styles.backButton(safeArea)]}>
-          <MaterialIcons name="arrow-back-ios" color={'#000'} size={25} />
+          <MaterialIcons name="arrow-back-ios" color={isTransparent ? '#fff' : '#000'} size={25} />
         </TouchableOpacity>
         <Text style={styles.title(isTransparent)}>{title}</Text>
       </View>
@@ -50,16 +50,16 @@ const styles = {
     height: TOPNAVI_H + safeArea.top,
     justifyContent: 'center',
     shadowOffset: {y: 0},
-    backgroundColor: isTransparent ? 'rgba(255,255,255,0)' : '#ECB04D',
+    backgroundColor: isTransparent ? 'rgba(255,255,255,0)' : '#fff',
     shadowOpacity: isTransparent ? 0 : 0.5,
     elevation: isTransparent ? 0.01 : 5,
-    zIndex: 100,
+    zIndex: 99,
   }),
   title: isTransparent => ({
     textAlign: 'center',
     fontWeight: 'bold',
     fontSize: 16,
-    color: isTransparent ? 'rgba(255,255,255,0)' : '#fff',
+    color: isTransparent ? 'rgba(255,255,255,0)' : '#000',
   }),
   backButton: (safeArea) => ({
     position: 'absolute',
@@ -68,19 +68,8 @@ const styles = {
     height: 40,
     left: 0,
     top: safeArea.top + 10,
-    backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
-    borderTopRightRadius: 10,
-    borderBottomRightRadius: 10,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 10,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 15,
   }),
 };
 

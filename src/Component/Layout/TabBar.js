@@ -77,10 +77,10 @@ export const TabBar = (props) => {
             onLongPress={onLongPress}
             style={{ flex: 1, alignItems: "center" }}
           >
-            {label === 'home' && <Icon name="home" color={isFocused ? '#ECB04D' : '#fff'} size={25} />}
-            {label === 'Search' && <Icon name="search" color={isFocused ? '#ECB04D' : '#fff'} size={25} />}
-            {label === 'story' && <MaterialIcons name="article" color={isFocused ? '#ECB04D' : '#fff'} size={25} />}
-            {label === 'account' && <Icon name="user" color={isFocused ? '#ECB04D' : '#fff'} size={25} />}
+            {label === '홈' && <Icon name="home" color={isFocused ? '#ECB04D' : '#fff'} size={25} />}
+            {label === '검색' && <Icon name="search" color={isFocused ? '#ECB04D' : '#fff'} size={25} />}
+            {label === '스토리' && <MaterialIcons name="article" color={isFocused ? '#ECB04D' : '#fff'} size={25} />}
+            {label === 'MY' && <Icon name="user" color={isFocused ? '#ECB04D' : '#fff'} size={25} />}
           </TouchableOpacity>
         );
       })}
